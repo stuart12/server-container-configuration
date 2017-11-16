@@ -9,7 +9,7 @@ Need to delete it on the console:
 
 ## CoreOS
 	sudo passwd -l core
-	scp ignition.json hh:
+	scp ignition.json hh: # on local
 	sudo dd if=/dev/zero of=/dev/sda10 bs=1M status=progress
 	sudo dd if=/dev/zero of=/dev/sda9 bs=1M status=progress
 	sudo coreos-install -d /dev/sda -i ignition.json -v
@@ -22,41 +22,3 @@ Need to delete it on the console:
 	sudo btrfs subvol create /snapshots
 	sudo btrfs subvol create /snapshots/rootfs
 	sudo btrfs subvol snapshot -r / /snapshots/rootfs/first
-
-
-
-
-
-## Perhaps not a good idea
-
-### Possible move of rootfs to a subvolume
-
-	: ; sudo btrfs subvolume snapshot / /rootfs
-	Create a snapshot of '/' in '//rootfs'
-	: ; sudo mkdir -m 755 /snapshots
-	: ; sudo btrfs subvolume list /
-	ID 257 gen 8 top level 5 path srv
-	ID 258 gen 9 top level 5 path var/lib/machines
-	ID 259 gen 10 top level 5 path var/tmp
-	ID 261 gen 22 top level 5 path rootfs
-	: ; sudo btrfs subvolume set-default 261 /
-	for i in var/tmp var/lib/machines srv; do sudo rmdir /rootfs/$i && sudo btrfs subvolume create /rootfs/$i && sudo chmod --reference /$i /rootfs/$i; done
-
-	: ; sudo rm -r /rootfs/etc && sudo btrfs subvol create /rootfs/etc && sudo cp -a /etc/. /rootfs/etc/.
-
-	core@localhost ~ $ sudo reboot
-
-	: ; sudo mkdir /disks /disks/btrfs /disks/btrfs/toplevel
-	: ; sudo mount  -o subvolid=0 /dev/sda9  /disks/btrfs/toplevel
-
-	cd /disks/btrfs/toplevel
-	sudo rm bin lib lib64 sbin
-	sudo btrfs subvol delete srv var/lib/machines var/tmp
-	sudo rm -r boot dev etc home media mnt proc root run sys tmp usr var
-
-### move /etc to a subvolume
-
-	cd snapshots
-	sudo btrfs subvol create /disks/btrfs/toplevel/snapshots/etc
-	sudo btrfs snapshot -r /etc /disks/btrfs/toplevel/snapshots/etc/original
-	core@localhost /disks/btrfs/toplevel/snapshots/etc $ sudo btrfs subvol snapshot -r /etc /disks/btrfs/toplevel/snapshots/etc/original
