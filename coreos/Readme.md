@@ -2,7 +2,8 @@
 
 ## Fix problem default route via eth1 on HostHatch.com
 
-The DYHCP server on eth1  give us a default route via eth1 but eth1 does not forward to the Internet.
+The DHCP server on eth1 gives returns a default route via eth1 but eth1 does not forward to the Internet.
+Need to delete it on the console:
 
 	sudo route del default
 
@@ -17,7 +18,7 @@ The DYHCP server on eth1  give us a default route via eth1 but eth1 does not for
 
 	: master; kvm -boot once=d -m 3G -drive file=hda,index=0,media=disk,format=raw  -cdrom coreos_production_iso_image.iso  -netdev user,id=user.0,hostfwd=tcp::5555-:22 -device e1000,netdev=user.0 -display  curses
 
-## create a snapshow of the install state
+## After install create a snapshot of the install state
 	sudo btrfs subvol create /snapshots
 	sudo btrfs subvol create /snapshots/rootfs
 	sudo btrfs subvol snapshot -r / /snapshots/rootfs/first
