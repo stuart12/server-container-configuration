@@ -1,0 +1,19 @@
+# https://miki725.github.io/docker/crypto/2017/01/29/docker+nginx+letsencrypt.html
+version: '3.2'
+services:
+  nginx:
+    build: ./nginx
+    container_name: reverseproxy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - type: volume
+        source: certs
+        target: /etc/letsencrypt
+      - type: volume
+        source: certs-run
+        target: /run/letsencrypt
+volumes:
+  certs:
+  certs-run:
