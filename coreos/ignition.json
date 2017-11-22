@@ -1,0 +1,74 @@
+{
+  "ignition": {
+    "version": "2.1.0"
+  },
+  "storage": {
+      "files": [
+      {
+        "filesystem": "root",
+        "path": "/etc/hostname",
+        "mode": 420,
+        "contents": { "source": "data:,stuart1%0A" }
+      },
+      {
+        "filesystem": "root",
+        "path": "/etc/ssh/sshd_config",
+        "contents": {
+          "source": "data:,UsePrivilegeSeparation%20sandbox%0ASubsystem%20sftp%20internal-sftp%0AUseDNS%20no%0A%0APermitRootLogin%20no%0AAllowUsers%20core%0AAuthenticationMethods%20publickey%0AUsePAM%20yes%0APrintLastLog%20no%0APrintMotd%20no%0A"
+        },
+        "mode": 384
+      }
+    ],
+    "disks": [{
+      "device" : "/dev/vda",
+      "partitions": [{
+        "label": "swap",
+        "number": 10,
+        "start": 40894464
+      }]
+    }],
+    "filesystems": [{
+      "name": "root2",
+      "mount": {
+        "device": "/dev/disk/by-label/ROOT",
+        "format": "btrfs",
+	"wipeFilesystem": true,
+	"label": "ROOT",
+        "options": [ "--label=ROOT" ]
+      }
+    },
+    {
+      "name": "swap2",
+      "mount": {
+        "device": "/dev/disk/by-partlabel/swap",
+        "format": "swap",
+	"wipeFilesystem": true,
+        "options": [ "-L", "SWAP" ]
+      }
+    }]
+  },
+  "systemd": {
+    "units": [{
+      "name": "dev-disk-by\\x2dpartlabel-swap.swap",
+      "enabled": true,
+      "contents": "[Unit]\nDescription=Swap on swap partition\n\n[Install]\nWantedBy=swap.target\n\n[Swap]\nWhat=/dev/disk/by-partlabel/swap\n"
+    }]
+  },
+  "networkd": {
+    "units": [{
+      "name": "00-eth1.network",
+      "contents": "[Match]\nName=eth1\n\n[Network]\nDHCP=yes\n\n[DHCP]\nRouteMetric=2000\nUseMTU=true\n"
+    }]
+  },
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "sshAuthorizedKeys": [
+	  "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA34JVpS1wfN99SxuuwKQBKgUxOu6JmJq1ANO/A+/Iypabn3AbEyeXUCJPQe+VY/p8Opk01Ywm6h/vAQgHILGVDsBR0EQ4Ku444PXACBfdLkShclOR3LIUq3BDaZq1LJTryPQhqhnTBhLUvUvQy4RtLB8grKIEMcyGRcAr+1Uo4Bf+VU2VdFbW+dJb45jM66pd20/tmhBTFwHee8BO32nJKYHXdmgHOIci29bzPBJGnD0M3HFzbh9qgCLuTCWx9/77TogO28TPhoVP7BoOAji4YJxxzT/0CMeAoTRQaFB2aMAo56Ix+Pxnx2GYDq83NUWjjVBnTovlxIXxK7VcSlt7WQ== stuart@kooka",
+          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDpALXlfOqxYufZqrrTOPeycGGyOU4HLiO+sDraKQZ2zaepcxJOxB4FvpUwZlMjOrnFiSggamZ/R1WDX0+FgTlwifRKnVFEvzLBhVUTiS2zXHFxs0Ybi+lnOQjllyKgg/RbzKiuEdvmWGGDjJdA1puo2FczYii0xzKidVptvR0dHIbKevc3jqprMZZFPTZLh/vFm1PqWsGbKbisEPEQD60OyTliHL7+J/FyxAAWpAsYilV9TloiUrTrrqKWdhJ//gJZe7T6LAiyoOkdqBL+NOpfBMjL6JnhkpiQqHP6imZ1Kic5ygFEjFtuZhc+HWuN3eKQ60Ty0TOwN14ST8rFRR/ me@there.com"
+        ]
+      }
+    ]
+  }
+}
