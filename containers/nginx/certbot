@@ -1,0 +1,8 @@
+#!/bin/sh -xe
+run=/run/letsencrypt
+docker run --interactive --tty --rm 
+	--volume letsencrypt-etc:/etc/letsencrypt \
+	--volume letsencrypt-run:$run \
+	deliverous/certbot \
+	certonly --webroot --webroot-path=$run --no-eff-email --domains hh.pook.it,nextcloud.pook.it "$@"
+docker kill --signal=HUP proxy
