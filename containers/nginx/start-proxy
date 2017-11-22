@@ -1,0 +1,9 @@
+#!/bin/sh -xe
+docker run --interactive \
+	--publish 80:80 \
+	--publish 443:443 \
+	--volume letsencrypt-etc:/etc/letsencrypt:ro \
+	--volume letsencrypt-run:/run/letsencrypt:ro \
+	--name proxy \
+	"$@" \
+	myproxy
