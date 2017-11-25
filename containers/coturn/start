@@ -1,0 +1,5 @@
+#!/bin/sh -ex
+docker kill coturn
+docker rm coturn
+docker run --restart unless-stopped --detach --publish 3478:3478/udp --publish  3478:3478 --publish 49152-49352/udp --publish 127.0.0.1:5766:5766 --name coturn i-coturn
+docker logs --follow coturn
