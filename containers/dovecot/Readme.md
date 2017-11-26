@@ -12,6 +12,12 @@ nginx itself speaks just enough of these protocols to do the initial greeting an
 
 nginx then connects to the backend service, authenticates on behalf of the user using the credentials supplied by the auth service and, once completed, returns an "auth success" message to the client. All data in both directions is then proxied by nginx's normal connection proxying machinery.
 
+[Configuring NGINX as a Mail Proxy Server](https://www.nginx.com/resources/admin-guide/mail-proxy/)
+
+## authentication
+
+[Module ngx_mail_auth_http_module](https://nginx.org/en/docs/mail/ngx_mail_auth_http_module.html#protocol)
+
 [allow Dovecot as an authentication service](https://workaround.org/ispmail/jessie/setting-up-dovecot)
 
     # Postfix smtp-auth
@@ -45,3 +51,8 @@ You will be able to reach foo and bar from each other using DNS entries correspo
 
 ## via sockets?
 [Use Unix sockets with Docker](https://www.jujens.eu/posts/en/2017/Feb/15/docker-unix-socket/)
+
+
+## with Postfix
+
+[Postfix to Dovecot SASL communication](http://www.postfix.org/SASL_README.html#server_dovecot)
