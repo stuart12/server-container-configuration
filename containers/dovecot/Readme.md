@@ -37,7 +37,9 @@ nginx then connects to the backend service, authenticates on behalf of the user 
 
 [Searching for auth_http](https://www.nginx.com/resources/wiki/search/?q=auth_http)
 
+### simple pass through
 finally, [simple passthrough](https://serverfault.com/questions/594962/nginx-understanding-the-purpose-of-auth-http-imap-proxy)
+[example imap](http://mailman.nginx.org/pipermail/nginx/2010-February/019028.html)
 
 Do i have to write php? [Using a PHP Script on an Apache Server as the IMAP Auth Backend](https://www.nginx.com/resources/wiki/start/topics/examples/imapauthenticatewithapachephpscript/)
 
