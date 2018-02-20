@@ -2,7 +2,9 @@
 
 ## cut and paste a ssh-key (in a new file)
 
-    docker run   --mount type=volume,source=git-servekeys,destination=/git-server/keys -it --rm bash:4.4
+    docker stop git-server
+    docker run   --mount type=volume,source=git-server-keys,destination=/git-server/keys -it --rm bash:4.4
+    docker start git-server
 
 ## add a repo
     git init --bare $NEW_REPO_NAME
