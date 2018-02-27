@@ -16,5 +16,8 @@
 
 [nginx: [emerg] 1#1: mail directive is not allowed here](https://stackoverflow.com/questions/47296679/nginx-emerg-11-mail-directive-is-not-allowed-here-in-etc-nginx-conf-d-de)
 
+# check renewal
+	docker run --interactive --tty --rm --volume letsencrypt-etc-test:/etc/letsencrypt --volume letsencrypt-run:/run/letsencrypt deliverous/certbot certonly --webroot --webroot-path=/run/letsencrypt --email ${EMAIL?'define EMAIL'} --no-eff-email --domains hh.pook.it,nextcloud.pook.it,ffsync.pook.it  --staging
+
 
 [Markdown: Syntax](https://daringfireball.net/projects/markdown/syntax)
