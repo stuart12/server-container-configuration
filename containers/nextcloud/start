@@ -1,0 +1,21 @@
+#!/bin/sh -ex
+# https://github.com/nextcloud/docker
+name=nextcloud
+docker run \
+	--detach \
+	--volume nextcloud:/var/www/html \
+	--volume nextcloud_apps:/var/www/html/custom_apps \
+	--volume nextcloud_config:/var/www/html/config \
+	--volume nextcloud_data:/var/www/html/data \
+	--network mariadb \
+	--name $name \
+	--env MYSQL_DATABASE=nextcloud \
+	--env MYSQL_USER=nextcloud \
+	--env MYSQL_PASSWORD="${1?}" \
+	--env MYSQL_HOST=mariadb \
+	--env NEXTCLOUD_ADMIN_USER=slpadmin \
+	--env NEXTCLOUD_ADMIN_PASSWORD="${2?}" \
+	--restart unless-stopped \
+	nextcloud
+
+docker network connect proxy $name

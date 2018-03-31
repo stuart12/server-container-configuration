@@ -1,6 +1,6 @@
 #!/bin/sh -xe
 run=/run/letsencrypt
-docker run --interactive --tty --rm 
+docker run --interactive --tty --rm \
 	--volume letsencrypt-etc:/etc/letsencrypt \
 	--volume letsencrypt-run:$run \
 	deliverous/certbot \
