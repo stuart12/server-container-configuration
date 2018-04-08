@@ -1,8 +1,7 @@
 # vim:ft=yaml
 # https://github.com/matrix-org/synapse/issues/2438
 
-# Don't bind to the https port
-no_tls: True
+uploads_path: /var/lib/matrix-synapse/uploads
 
 ## Server ##
 
@@ -12,21 +11,10 @@ listeners:
   # Main HTTPS listener
   # For when matrix traffic is sent directly to synapse.
   -
-    # The port to listen for HTTPS requests on.
     port: 8448
-
-    # Local addresses to listen on.
-    # This will listen on all IPv4 addresses by default.
-    bind_addresses:
-      - '0.0.0.0'
-
-    # This is a 'http' listener, allows us to specify 'resources'.
+    bind_address: ''
     type: http
-
     tls: true
-
-    # Use the X-Forwarded-For (XFF) header as the client IP and not the
-    # actual client IP.
     x_forwarded: false
 
     # List of HTTP resources to serve on this listener.
@@ -38,9 +26,11 @@ listeners:
   # For when matrix traffic passes through loadbalancer that unwraps TLS.
   - port: 8008
     tls: false
-    bind_addresses: ['0.0.0.0']
+    bind_address: ''
     type: http
 
+    # Use the X-Forwarded-For (XFF) header as the client IP and not the
+    # actual client IP.
     x_forwarded: true
 
     resources:

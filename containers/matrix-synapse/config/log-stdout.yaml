@@ -17,11 +17,11 @@ handlers:
 
 loggers:
     synapse:
-        level: DEBUG
+        level: INFO
 
     synapse.storage.SQL:
-        level: DEBUG
+        level: INFO
 
 root:
-    level: DEBUG
+    level: INFO
     handlers: [console]
