@@ -1,12 +1,10 @@
 # vim:ft=yaml
+# https://github.com/matrix-org/synapse/issues/2438
 
 # Don't bind to the https port
 no_tls: True
 
 ## Server ##
-
-# When running as a daemon, the file to store the pid in
-pid_file: /run/homeserver.pid
 
 # List of ports that Synapse should listen on, their purpose and their
 # configuration.
@@ -21,10 +19,6 @@ listeners:
     # This will listen on all IPv4 addresses by default.
     bind_addresses:
       - '0.0.0.0'
-      # Uncomment to listen on all IPv6 interfaces
-      # N.B: On at least Linux this will also listen on all IPv4
-      # addresses, so you will need to comment out the line above.
-      # - '::'
 
     # This is a 'http' listener, allows us to specify 'resources'.
     type: http
@@ -37,17 +31,6 @@ listeners:
 
     # List of HTTP resources to serve on this listener.
     resources:
-      -
-        # List of resources to host on this listener.
-        names:
-          - client     # The client-server APIs, both v1 and v2
-#          - webclient  # The bundled webclient.
-#
-#        # Should synapse compress HTTP responses to clients that support it?
-#        # This should be disabled if running synapse behind a load balancer
-#        # that can do automatic compression.
-        compress: true
-#
       - names: [federation]  # Federation APIs
         compress: false
 
@@ -61,17 +44,5 @@ listeners:
     x_forwarded: true
 
     resources:
-      - names: [client, webclient]
+      - names: [client]
         compress: true
-
-## Signing Keys ##
-# Path to the signing key to sign messages with
-signing_key_path: "/etc/matrix-synapse/signing.key"
-
-## Registration ##
-# Enable registration for new users.
-enable_registration: False
-
-## Turn ##
-# How long generated TURN credentials last
-turn_user_lifetime: "1h"

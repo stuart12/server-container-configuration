@@ -1,0 +1,27 @@
+version: 1
+
+formatters:
+  precise:
+   format: '%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(request)s- %(message)s'
+
+filters:
+  context:
+    (): synapse.util.logcontext.LoggingContextFilter
+    request: ""
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: precise
+    filters: [context]
+
+loggers:
+    synapse:
+        level: DEBUG
+
+    synapse.storage.SQL:
+        level: DEBUG
+
+root:
+    level: DEBUG
+    handlers: [console]
