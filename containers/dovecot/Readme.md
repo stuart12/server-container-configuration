@@ -58,3 +58,7 @@ You will be able to reach foo and bar from each other using DNS entries correspo
 ## with Postfix
 
 [Postfix to Dovecot SASL communication](http://www.postfix.org/SASL_README.html#server_dovecot)
+
+## Build
+
+	docker build --tag dovecot .

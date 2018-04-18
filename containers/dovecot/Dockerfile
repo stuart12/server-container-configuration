@@ -1,13 +1,19 @@
 # A docker image for https://www.dovecot.org/
 
-FROM alpine:latest
+FROM stuart/debian-sid:2018.03.31
 LABEL version="1.0"
 MAINTAINER Stuart Pook
+
+RUN apt-get update -q
+RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y
+
+EXPOSE 143
+
 ENV USERS /etc/dovecot/users
 # must match homedir in $USERS
 ENV HOME_FS /mail
 
-RUN apk add --no-cache dovecot bash
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends dovecot-imapd
 #RUN echo ssl = no > /etc/dovecot/conf.d/10-ssl.conf
 #RUN echo disable_plaintext_auth = no > /etc/dovecot/conf.d/11-auth.conf
 COPY conf.d/10-master.conf /etc/dovecot/conf.d/10-master.conf
@@ -19,6 +25,3 @@ RUN sed -ne 's/[^:]*:[^:]*:\([^:]*\):\([^:]*\):[^:]*:\([^:]*\):.*/mkdir -m 700 \
 VOLUME $HOME_FS
 
 ENTRYPOINT [ "/usr/sbin/dovecot", "-F" ]
-ENTRYPOINT exec bash
-
-EXPOSE 143
