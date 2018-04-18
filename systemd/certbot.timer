@@ -1,0 +1,8 @@
+# https://coreos.com/os/docs/latest/scheduling-tasks-with-systemd-timers.html
+[Unit]
+Description=Renew Let's Encrypt Certificates Every Day
+[Timer]
+OnCalendar=daily
+Persistent=true
+[Install]
+WantedBy=timers.target

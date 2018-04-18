@@ -1,0 +1,6 @@
+[Unit]
+Description=Renew Let's Encrypt Certificates
+[Service]
+EnvironmentFile=/etc/stuart/systemd/certbot.env
+Type=oneshot
+ExecStart=/bin/sh -xc '/usr/bin/docker run --rm --volume letsencrypt-etc:/etc/letsencrypt --volume letsencrypt-run:/run/letsencrypt deliverous/certbot renew --webroot --webroot-path=/run/letsencrypt --email $EMAIL --no-eff-email --post-hook "echo DONE4" | tee /dev/stdout | grep --with-filename --label Found ^DONE4 && /usr/bin/docker kill -s HUP proxy; exit 0'
