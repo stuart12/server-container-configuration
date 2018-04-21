@@ -16,7 +16,7 @@ ENV HOME_FS /mail
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends dovecot-imapd
 #RUN echo ssl = no > /etc/dovecot/conf.d/10-ssl.conf
 #RUN echo disable_plaintext_auth = no > /etc/dovecot/conf.d/11-auth.conf
-COPY conf.d/10-master.conf /etc/dovecot/conf.d/10-master.conf
+COPY conf.d /etc/dovecot/conf.d/
 COPY users $USERS
 RUN echo log_path = /dev/stdout > /etc/dovecot/conf.d/10-logging.conf
 

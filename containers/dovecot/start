@@ -1,7 +1,13 @@
 #!/bin/sh -ex
 w=dovecot
+docker build --tag $w .
 docker kill $w
 docker rm $w
-docker run --init --detach --name $w --network proxy $w
-#docker run -it --publish 127.0.0.1:143:143 --name $w i-$w
+docker run --init \
+	--network proxy \
+	--ip 192.168.42.1 \
+	--detach \
+	--name $w \
+       	$w
+#docker network connect --ip 192.168.42.1 proxy $w
 docker logs --follow $w

@@ -62,3 +62,11 @@ You will be able to reach foo and bar from each other using DNS entries correspo
 ## Build
 
 	docker build --tag dovecot .
+
+## check openssl
+	apt install -y openssl
+	openssl s_client -connect proxy:143 -starttls imap
+
+## change password
+	doveadm pw -s SSHA512
+	doveadm pw -s SSHA512  -t <HASH>

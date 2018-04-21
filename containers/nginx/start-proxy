@@ -1,11 +1,19 @@
 #!/bin/sh -xe
+n=proxy
+docker build --tag myproxy .
+docker stop $n
+docker rm proxy
 docker run --detach \
 	--network proxy \
+	--ip 192.168.42.2 \
 	--publish 80:80 \
 	--publish 443:443 \
+	--publish 127.0.0.1:143:143 \
 	--volume letsencrypt-etc:/etc/letsencrypt:ro \
 	--volume letsencrypt-run:/run/letsencrypt:ro \
-	--name proxy \
+	--name $n \
 	--restart unless-stopped \
-	"$@" \
-	myproxy
+	myproxy \
+	"$@"
+#docker network connect --ip 192.168.42.2 proxy $n # needed by dovecot
+docker logs --follow proxy
