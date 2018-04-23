@@ -1,6 +1,8 @@
+# A dockerfile for postgresql
+
 # https://docs.docker.com/engine/examples/postgresql_service
 FROM stuart/debian-sid:2018.03.31
-MAINTAINER Stuart Pook
+LABEL maintainer "Stuart Pook"
 EXPOSE 5432
 ARG version=10
 
@@ -27,3 +29,5 @@ RUN mkdir -m 755 /var/run/postgresql/10-main.pg_stat_tmp
 
 ENTRYPOINT ["/usr/lib/postgresql/10/bin/postgres"]
 CMD ["-D", "/var/lib/postgresql/10/main", "-c", "config_file=/etc/postgresql/10/main/postgresql.conf"]
+
+LABEL version "1.1"
