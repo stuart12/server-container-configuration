@@ -1,8 +1,7 @@
 # A docker image for https://www.dovecot.org/
 
 FROM stuart/debian-sid:2018.03.31
-LABEL version="1.0"
-MAINTAINER Stuart Pook
+LABEL maintainer "Stuart Pook"
 
 RUN apt-get update -q
 RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y
@@ -14,8 +13,9 @@ ENV USERS /etc/dovecot/users
 ENV HOME_FS /mail
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends dovecot-imapd
-#RUN echo ssl = no > /etc/dovecot/conf.d/10-ssl.conf
-#RUN echo disable_plaintext_auth = no > /etc/dovecot/conf.d/11-auth.conf
+RUN apt-get clean
+RUN apt-get auto-remove -y
+
 COPY conf.d /etc/dovecot/conf.d/
 COPY users $USERS
 RUN echo log_path = /dev/stdout > /etc/dovecot/conf.d/10-logging.conf
@@ -25,3 +25,7 @@ RUN sed -ne 's/[^:]*:[^:]*:\([^:]*\):\([^:]*\):[^:]*:\([^:]*\):.*/mkdir -m 700 \
 VOLUME $HOME_FS
 
 ENTRYPOINT [ "/usr/sbin/dovecot", "-F" ]
+
+VOLUME /var/sockets
+
+LABEL version "1.1"

@@ -1,15 +1,15 @@
 #!/bin/sh -ex
-w=dovecot
+w=exim4
 docker build --tag $w .
 docker kill $w || true
-docker rm $w
-docker run --init \
+docker rm $w || true
+docker run \
+	--init \
 	--network proxy \
-	--ip 192.168.42.1 \
+	--ip 192.168.42.3 \
 	--detach \
 	--name $w \
 	--volume email:/mail \
-	--volume dovecot-sockets:/var/sockets \
+	--volume dovecot-sockets:/var/dovecot-sockets:ro \
        	$w
-#docker network connect --ip 192.168.42.1 proxy $w
 docker logs --follow $w
