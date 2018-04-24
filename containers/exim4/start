@@ -11,5 +11,6 @@ docker run \
 	--name $w \
 	--volume email:/mail \
 	--volume dovecot-sockets:/var/dovecot-sockets:ro \
+	--volume letsencrypt-etc:/etc/letsencrypt:ro \
        	$w
 docker logs --follow $w
