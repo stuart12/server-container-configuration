@@ -15,3 +15,6 @@
 
 ## connect to nginx proxy
 	docker network connect proxy matrix-synapse
+
+## create a user
+	docker exec --interactive --tty matrix-synapse register_new_matrix_user -c /etc/matrix-synapse/conf.d/registration.yaml -u <person> -p <password> http://localhost:8008
