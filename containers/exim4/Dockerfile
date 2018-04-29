@@ -49,6 +49,7 @@ RUN \
 RUN addgroup --gid 500 vmail
 RUN adduser --disabled-password --disabled-login --uid 500 --gid 500 --gecos 'Virtual Email User' vmail
 
+VOLUME /var/spool/exim4
 COPY keys /tmp/keys
 RUN chown -R vmail /tmp/keys
 COPY exim4 /etc/exim4
@@ -59,9 +60,9 @@ RUN gpg --import /tmp/keys/* && rm -r /tmp/keys
 USER Debian-exim
 ENTRYPOINT [ "/usr/sbin/exim4" ]
 CMD [ \
-	"-q20m", \
+	"-q5m", \
 	#"-d-all+ident" , \
 	"-v", \
 	"-bd" \
 ]
-LABEL version="1.4"
+LABEL version="1.5"
