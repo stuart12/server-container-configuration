@@ -64,4 +64,4 @@ CMD [ \
 	"-v", \
 	"-bd" \
 ]
-LABEL version="1.3"
+LABEL version="1.4"
