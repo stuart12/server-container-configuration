@@ -10,3 +10,5 @@ check hh
 check ffsync
 check smtp3 submission smtp
 check imap3 imap imap
+
+# use https://github.com/ahaw021/SSL-MAIL-PROTOCOLS-TESTING ?
