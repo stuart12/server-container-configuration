@@ -9,7 +9,7 @@ docker run --detach \
 	--ip 192.168.42.2 \
 	--publish 80:80 \
 	--publish 443:443 \
-	--publish 127.0.0.1:143:143 \
+	--publish 143:143 \
 	--volume letsencrypt-etc:/etc/letsencrypt:ro \
 	--volume letsencrypt-run:/run/letsencrypt:ro \
 	--name $n \

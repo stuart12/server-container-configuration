@@ -9,20 +9,32 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y
 
 #http://www.brain-dump.org/blog/entry/40/Creating_dummy_packages_to_fullfill_dependencies_in_Debian
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends equivs
-RUN cd /tmp && echo Package: exim4-config-2 | equivs-build /dev/stdin && dpkg -i exim4-config-2_1.0_all.deb && rm exim4-config-2_1.0_all.deb
+RUN cd /tmp && \
+	echo Package: exim4-config-2 | equivs-build /dev/stdin && \
+	dpkg -i exim4-config-2_1.0_all.deb && \
+	rm exim4-config-2_1.0_all.deb
 RUN mkdir /var/lib/exim4
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends exim4-daemon-heavy
-RUN adduser Debian-exim letsencrypt
-RUN apt-get clean
-
-RUN apt-get auto-remove -y
-RUN apt-get --purge -q -y --allow-remove-essential remove \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends \
+	exim4-daemon-heavy \
+	gpg \
+	libmail-gnupg-perl \
+	libmime-tools-perl \
+	ca-certificates \
+	wget \
+	&& apt-get clean
+RUN wget --quiet --output-document /usr/local/bin/gpgit.pl https://gitlab.com/mikecardwell/gpgit/raw/33e5a08edc935b6fc678941beb663de12d023b63/gpgit.pl
+RUN chmod 755 /usr/local/bin/gpgit.pl
+RUN apt-get --purge --quiet --yes --allow-remove-essential remove \
+	wget \
 	e2fsprogs \
 	fdisk \
 	login \
 	mount \
 	&& true
+RUN apt-get auto-remove --yes
+
+RUN adduser Debian-exim letsencrypt
 
 EXPOSE 25 587
 
@@ -34,17 +46,22 @@ RUN \
 	ln -s /dev/stderr /var/log/exim4/paniclog && \
 	true
 
-VOLUME /mail
+RUN addgroup --gid 500 vmail
+RUN adduser --disabled-password --disabled-login --uid 500 --gid 500 --gecos 'Virtual Email User' vmail
 
+COPY keys /tmp/keys
+RUN chown -R vmail /tmp/keys
 COPY exim4 /etc/exim4
+USER vmail
+RUN /usr/local/bin/gpgit.pl --help > /dev/null
+RUN gpg --import /tmp/keys/* && rm -r /tmp/keys
 
 USER Debian-exim
-
 ENTRYPOINT [ "/usr/sbin/exim4" ]
 CMD [ \
-	"-q30m", \
+	"-q20m", \
 	#"-d-all+ident" , \
 	"-v", \
 	"-bd" \
 ]
-LABEL version="1.1"
+LABEL version="1.3"
