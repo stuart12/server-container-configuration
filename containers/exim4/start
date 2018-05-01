@@ -13,5 +13,6 @@ docker run \
 	--volume exim4:/etc/exim-volume:ro \
 	--volume dovecot-sockets:/var/dovecot-sockets:ro \
 	--volume letsencrypt-etc:/etc/letsencrypt:ro \
+	--volume exim4-spool:/var/spool/exim4 \
        	$w
 docker logs --follow $w
