@@ -1,6 +1,6 @@
 # Notes for exim4 docker container
 ## Authentification
-	echo -ne '\0stuart\0my-password' | base64
+	echo -ne '\0'$USER'\0my-password' | base64
 	telnet exim4 587
 	ehlo iii
 	auth plain AHN0dWFydABkZGRkZGRkZGRk
@@ -25,4 +25,6 @@ and put them in the keys directory
 	gpg --list-keys
 	gpg --export -armor you@example.org
 
-## checkout [swaks](https://linux.die.net/man/1/swaks)
+## checkout [swaks](https://linux.die.net/man/1/swaks) & [mail-tester](https://www.mail-tester.com/)
+	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $USER --auth-password "$PASSWD" --to $COOKIE@mail-tester.com --from fred@pook.it --header "Subject: hello $(date)" --body "hello Web, the computers are very slow today, Fred"
+	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $USER --auth-password "$PASSWD" --to $USER@acm.org --from dummy7@pook.it --header "Subject: $(date)"
