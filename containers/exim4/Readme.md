@@ -30,4 +30,10 @@ and put them in the keys directory
 	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $USER --auth-password "$PASSWD" --to $USER@acm.org --from dummy7@pook.it --header "Subject: $(date)"
 
 ### a free DKIM mail tester
-	[http://dkimvalidator.com](http://dkimvalidator.com/)
+[dkimvalidator.com](http://dkimvalidator.com/)
+http://dkim.org/specs/draft-allman-dkim-base-01.html
+https://dkimcore.org/c/keycheck
+
+### DMAC Setup
+[globalcyberalliance.org](https://dmarcguide.globalcyberalliance.org)
+[mxtoolbox.com](https://mxtoolbox.com/SuperTool.aspx?action=dmarc%3apook.it&run=networktools)
