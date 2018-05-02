@@ -11,6 +11,7 @@ docker run \
 	--name $w \
 	--volume email:/mail \
 	--volume exim4:/etc/exim-volume:ro \
+	--volume exim4-dkim:/etc/exim-dkim:ro \
 	--volume dovecot-sockets:/var/dovecot-sockets:ro \
 	--volume letsencrypt-etc:/etc/letsencrypt:ro \
 	--volume exim4-spool:/var/spool/exim4 \

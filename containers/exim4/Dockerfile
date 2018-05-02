@@ -51,13 +51,28 @@ RUN adduser --disabled-password --disabled-login --uid 500 --gid 500 --gecos 'Vi
 
 VOLUME /var/spool/exim4
 COPY keys /tmp/keys
-RUN chown -R vmail /tmp/keys
+ARG EMAIL_OWNER=vmail
+RUN chown -R $EMAIL_OWNER /tmp/keys
 COPY exim4 /etc/exim4
-USER vmail
+ARG DKIM_VOL=/etc/exim-dkim
+ARG DKIM_PRIV=$DKIM_VOL/dkim_rsa.private
+RUN sed -i -e "/^ *dkim_private_key/s@DKIM_PRIV-replaced-by-Dockerfile@$DKIM_PRIV@" /etc/exim4/exim4.conf
+
+ARG EXIM_USER=Debian-exim
+RUN \
+	mkdir -m 2755 $DKIM_VOL && \
+	chgrp $EXIM_USER $DKIM_VOL && \
+	openssl genrsa -out $DKIM_PRIV 2048 && \
+	openssl rsa -in $DKIM_PRIV -out $DKIM_VOL/dkim_rsa.public -pubout -outform PEM && \
+	chmod 640 $DKIM_PRIV && \
+	true
+VOLUME /etc/exim-dkim
+
+USER $EMAIL_OWNER
 RUN /usr/local/bin/gpgit.pl --help > /dev/null
 RUN gpg --import /tmp/keys/* && rm -r /tmp/keys
 
-USER Debian-exim
+USER $EXIM_USER
 ENTRYPOINT [ "/usr/sbin/exim4" ]
 CMD [ \
 	"-q5m", \
@@ -65,4 +80,4 @@ CMD [ \
 	"-v", \
 	"-bd" \
 ]
-LABEL version="1.5"
+LABEL version="1.6"
