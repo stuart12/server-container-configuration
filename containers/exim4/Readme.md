@@ -28,3 +28,6 @@ and put them in the keys directory
 ## checkout [swaks](https://linux.die.net/man/1/swaks) & [mail-tester](https://www.mail-tester.com/)
 	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $USER --auth-password "$PASSWD" --to $COOKIE@mail-tester.com --from fred@pook.it --header "Subject: hello $(date)" --body "hello Web, the computers are very slow today, Fred"
 	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $USER --auth-password "$PASSWD" --to $USER@acm.org --from dummy7@pook.it --header "Subject: $(date)"
+
+### a free DKIM mail tester
+	[http://dkimvalidator.com](http://dkimvalidator.com/)
