@@ -5,7 +5,8 @@ docker kill $w || true
 docker rm $w || true
 docker run \
 	--init \
-	--publish 127.0.0.1:25:25 \
+	--restart unless-stopped \
+	--publish 25:25 \
 	--publish 587:587 \
 	--detach \
 	--name $w \
