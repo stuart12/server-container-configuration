@@ -17,11 +17,11 @@ handlers:
 
 loggers:
     synapse:
-        level: INFO
+        level: WARN
 
     synapse.storage.SQL:
-        level: INFO
+        level: WARN
 
 root:
-    level: INFO
+    level: WARN
     handlers: [console]
