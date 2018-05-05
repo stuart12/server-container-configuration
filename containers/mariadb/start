@@ -1,13 +1,20 @@
-#!/bin/sh
+#!/bin/sh -x
+cd $(dirname "$0")
+. ./passwords
+: ${MYSQL_ROOT_PASSWORD?} ${MYSQL_PASSWORD=?}
 # https://hub.docker.com/_/mariadb/
-exec docker run \
+docker kill mariadb
+docker rm mariadb
+docker run \
 	--detach \
 	--name mariadb \
-	--env MYSQL_ROOT_PASSWORD="${1?}" \
+	--env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD?}" \
 	--env MYSQL_DATABASE=nextcloud \
 	--env MYSQL_USER=nextcloud \
-	--env MYSQL_PASSWORD="${2?}" \
+	--env MYSQL_PASSWORD="${MYSQL_PASSWORD=?}" \
 	--network mariadb \
 	--restart unless-stopped \
+	--volume mariadb-database:/var/lib/mysql \
 	mariadb:latest
-	
+
+docker logs --follow mariadb
