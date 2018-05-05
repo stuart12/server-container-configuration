@@ -1,0 +1,17 @@
+#!/bin/sh -e
+cd $(dirname "$0")
+w=matrix-synapse
+docker build --tag $w .
+docker stop $w || true
+docker rm $w
+docker run \
+	--publish 8448:8448 \
+	--restart unless-stopped \
+	--name matrix-synapse \
+	--detach \
+	--network postgresql \
+	--mount source=matrix-media,destination=/var/lib/matrix-synapse/media \
+	--init \
+	$w
+docker network connect proxy $w
+docker logs --follow $w
