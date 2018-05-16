@@ -8,7 +8,7 @@
 
 ## Docker Hints
 ### shell in the container
-	docker exec -it exim4 bash
+	docker exec --tty --interactive --user root exim4 bash
 
 ### connect with ssl
 	openssl s_client -connect exim4:587 -starttls smtp
@@ -26,8 +26,8 @@ and put them in the keys directory
 	gpg --export -armor you@example.org
 
 ## checkout [swaks](https://linux.die.net/man/1/swaks) & [mail-tester](https://www.mail-tester.com/)
-	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $USER --auth-password "$PASSWD" --to $COOKIE@mail-tester.com --from fred@pook.it --header "Subject: hello $(date)" --body "hello Web, the computers are very slow today, Fred"
-	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $USER --auth-password "$PASSWD" --to $USER@acm.org --from dummy7@pook.it --header "Subject: $(date)"
+	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $AS --auth-password "$PASSWD" --to $COOKIE@mail-tester.com --from fred@pook.it --header "Subject: hello $(date)" --body "hello Web, the computers are very slow today, Fred"
+	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $AS --auth-password "$PASSWD" --to $AS@acm.org --from dummy7@pook.it --header "Subject: $(date)"
 
 ### a free DKIM mail tester
 [dkimvalidator.com](http://dkimvalidator.com/)
