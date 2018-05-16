@@ -2,41 +2,32 @@
 
 FROM stuart/debian-sid:2018.03.31
 MAINTAINER Stuart Pook
+EXPOSE 25 587
 
 RUN addgroup --system --gid 376 letsencrypt
-RUN apt-get update -q
-RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y
+RUN apt-get update -q && \
+	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y && \
+	DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends \
+		equivs \
+		gpg \
+		libmail-gnupg-perl \
+		libmime-tools-perl \
+		ca-certificates \
+		wget \
+	&& true
 
 #http://www.brain-dump.org/blog/entry/40/Creating_dummy_packages_to_fullfill_dependencies_in_Debian
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends equivs
 RUN cd /tmp && \
 	echo Package: exim4-config-2 | equivs-build /dev/stdin && \
 	dpkg -i exim4-config-2_1.0_all.deb && \
-	rm exim4-config-2_1.0_all.deb
-RUN mkdir /var/lib/exim4
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends \
-	exim4-daemon-heavy \
-	gpg \
-	libmail-gnupg-perl \
-	libmime-tools-perl \
-	ca-certificates \
-	wget \
-	&& apt-get clean
-RUN wget --quiet --output-document /usr/local/bin/gpgit.pl https://gitlab.com/mikecardwell/gpgit/raw/33e5a08edc935b6fc678941beb663de12d023b63/gpgit.pl
-RUN chmod 755 /usr/local/bin/gpgit.pl
-RUN apt-get --purge --quiet --yes --allow-remove-essential remove \
-	wget \
-	e2fsprogs \
-	fdisk \
-	login \
-	mount \
-	&& true
-RUN apt-get auto-remove --yes
+	rm exim4-config-2_1.0_all.deb && \
+	mkdir -m 755 /var/lib/exim4 && \
+	DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends exim4-daemon-heavy
+RUN apt-get clean
 
 RUN adduser Debian-exim letsencrypt
-
-EXPOSE 25 587
+RUN wget --quiet --output-document /usr/local/bin/gpgit.pl https://gitlab.com/mikecardwell/gpgit/raw/33e5a08edc935b6fc678941beb663de12d023b63/gpgit.pl
+RUN chmod 755 /usr/local/bin/gpgit.pl
 
 RUN \
 	chown root:Debian-exim /var/log/exim4 && \
@@ -68,6 +59,21 @@ RUN \
 	true
 VOLUME /etc/exim-dkim
 
+RUN apt-get --quiet --yes --auto-remove --allow-remove-essential purge \
+	wget \
+	e2fsprogs \
+	fdisk \
+	login \
+	mount \
+	man-db \
+	sed \
+	findutils \
+	bsdmainutils \
+	bsdutils \
+	hostname \
+	&& true
+#RUN apt-get auto-remove --yes
+
 USER $EMAIL_OWNER
 RUN /usr/local/bin/gpgit.pl --help > /dev/null
 RUN gpg --import /tmp/keys/* && rm -r /tmp/keys
@@ -80,4 +86,4 @@ CMD [ \
 	"-v", \
 	"-bd" \
 ]
-LABEL version="1.6"
+LABEL version="1.7"
