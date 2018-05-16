@@ -44,10 +44,8 @@ VOLUME /var/spool/exim4
 COPY keys /tmp/keys
 ARG EMAIL_OWNER=vmail
 RUN chown -R $EMAIL_OWNER /tmp/keys
-COPY exim4 /etc/exim4
 ARG DKIM_VOL=/etc/exim-dkim
 ARG DKIM_PRIV=$DKIM_VOL/dkim_rsa.private
-RUN sed -i -e "/^ *dkim_private_key/s@DKIM_PRIV-replaced-by-Dockerfile@$DKIM_PRIV@" /etc/exim4/exim4.conf
 
 ARG EXIM_USER=Debian-exim
 RUN \
@@ -66,13 +64,14 @@ RUN apt-get --quiet --yes --auto-remove --allow-remove-essential purge \
 	login \
 	mount \
 	man-db \
-	sed \
 	findutils \
 	bsdmainutils \
 	bsdutils \
 	hostname \
 	&& true
-#RUN apt-get auto-remove --yes
+RUN apt-get auto-remove --yes
+COPY exim4 /etc/exim4
+RUN sed -i -e "/^ *dkim_private_key/s@DKIM_PRIV-replaced-by-Dockerfile@$DKIM_PRIV@" /etc/exim4/exim4.conf
 
 USER $EMAIL_OWNER
 RUN /usr/local/bin/gpgit.pl --help > /dev/null
