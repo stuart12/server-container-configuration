@@ -1,0 +1,4 @@
+if first_delivery and not $authenticated_id is ""
+then
+	unseen save /mail/$authenticated_id/Maildir/Sent/
+endif
