@@ -26,8 +26,10 @@ and put them in the keys directory
 	gpg --export -armor you@example.org
 
 ## checkout [swaks](https://linux.die.net/man/1/swaks) & [mail-tester](https://www.mail-tester.com/)
-	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $AS --auth-password "$PASSWD" --to $COOKIE@mail-tester.com --from fred@pook.it --header "Subject: hello $(date)" --body "hello Web, the computers are very slow today, Fred"
-	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $AS --auth-password "$PASSWD" --to $AS@acm.org --from dummy7@pook.it --header "Subject: $(date)"
+	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $AS --auth-password "$PASSWD" --to $COOKIE@mail-tester.com --from someone587@pook.it --header "Subject: hello $(date)" --body "hello Web, the computers are very slow today, Fred"
+	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $AS --auth-password "$PASSWD" --to $AS@acm.org --from dummy587@pook.it --header "Subject: 587 $(date)"
+	swaks --silent 1 --server smtp3.pook.it:25  --tls  --to $AS@pook.it --from dummy25@pook.it --header "Subject: port 25 $(date)"
+
 
 ### a free DKIM mail tester
 [dkimvalidator.com](http://dkimvalidator.com/)
