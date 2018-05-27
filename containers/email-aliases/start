@@ -14,7 +14,8 @@ docker run \
 	--env ALIASES=$vol/aliases \
 	--env PREFIX=slp \
 	--env WHO=stuart \
-       	$w
+	--mount type=volume,source=email-aliases-ssh-keys,destination=/media/ssh-host-keys,readonly \
+	$w
 exec docker logs --follow $w
 
 	#--restart unless-stopped \
