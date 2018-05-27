@@ -1,0 +1,118 @@
+#!/usr/bin/python3
+# email-aliases Copyright (C) 2018 Stuart Pook (http://www.pook.it/)
+# Print or add aliases for exmi4
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import os
+import sys
+import argparse
+
+def myname():
+    return sys.argv[0]
+
+def error(*mess):
+    print(myname() + ":", *mess, file=sys.stderr)
+    sys.exit(2)
+
+def read_alias(aliases):
+    r = {}
+    with open(aliases) as f:
+        for l in f:
+            parts = l.split(':')
+            if len(parts) != 2:
+                error("bad alias line:", l.strip())
+            r[parts[0].strip()] = parts[1].strip()
+    return r
+
+def dump(aliases):
+    for k, v in aliases.items():
+        print(k, ":", v)
+
+def check_alias(alias, prefix):
+    if not alias.startswith(prefix):
+        error("new alias", alias, "does not start with", prefix)
+    if len(alias) < len(prefix) + 3:
+        error("new alias", alias, "too short")
+
+def check_destination(destination, alias, who):
+    # TODO: check no alias to base destination exists
+    prefix = who + "-alias-" + alias + "-"
+    if not destination.startswith(prefix):
+        error("new destination", destination, "does not start with", prefix)
+    if len(destination) < len(prefix) + 4:
+        error("new alias", destination, "too short")
+
+def update_file(aliases_filename, alias, destination):
+    out = alias + ": " + destination
+    with open(aliases_filename, "a") as aliases:
+        print(out, file=aliases)
+    print(out)
+
+def add_alias(alias, destination, aliases, prefix, who, aliases_filename):
+    dest = aliases.get(alias, None)
+    if dest is not None:
+        if dest == destination:
+            error("requested alias", alias + ":" + destination, "exists already with same destination")
+        else:
+            error("requested alias", alias + ":" + destination, "exists already", alias + ":" + aliases[alias])
+    check_alias(alias, prefix)
+    check_destination(destination, alias, who)
+    update_file(aliases_filename, alias, destination)
+
+def run(alias_file, prefix, who, aliases_filename, request):
+    aliases = read_alias(alias_file)
+    if request is None:
+        dump(aliases)
+    else:
+        parts = request.split(':')
+        if len(parts) == 1:
+            create_alias(parts[0])
+        elif len(parts) == 2:
+            add_alias(parts[0].strip(), parts[1].strip(), aliases, prefix, who, aliases_filename)
+        else:
+            error("too many fields in request", parts)
+    
+
+def get_environment():
+    env = '/proc/1/environ'
+    r = {}
+    with open(env, 'rb') as f:
+        for v in f.read().split(b'\0'):
+            decoded = v.decode('ascii')
+            if decoded:
+                fields = decoded.split('=', 1)
+                if len(fields) != 2:
+                    error("failed to parse", decoded, "in", env)
+                r[fields[0]] = fields[1]
+    return r
+
+def getenv(env, variable):
+    r = env.get(variable, None)
+    if r is None:
+        sys.exit(myname() + ': could not find ' + variable + ' in pid 1 env')
+    return r
+
+def main():
+    env = get_environment()
+    aliases = getenv(env, 'ALIASES')
+    prefix = getenv(env, 'PREFIX')
+    who = getenv(env, 'WHO')
+    parser = argparse.ArgumentParser(description='add an alias or print them all')
+    parser.add_argument("-c", dest="create", help="alias to create")
+
+    args = parser.parse_args()
+    run(aliases, prefix, who, aliases, args.create)
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)

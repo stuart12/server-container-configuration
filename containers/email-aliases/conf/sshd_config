@@ -1,0 +1,12 @@
+AuthenticationMethods publickey
+Banner no
+ChallengeResponseAuthentication no
+DebianBanner no
+DisableForwarding yes
+PasswordAuthentication no
+PermitRootLogin no
+PermitTTY no
+PermitUserRC no
+PidFile none
+PrintMotd no
+StrictModes yes

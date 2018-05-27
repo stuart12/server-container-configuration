@@ -1,0 +1,21 @@
+#!/bin/sh -ex
+w=exim-aliases
+docker build --tag $w .
+docker kill $w || true
+docker rm $w || true
+vol=/media/exim-volume
+docker run \
+	--init \
+	--detach \
+	--publish 2223:2222 \
+	--cap-drop=all \
+	--name $w \
+	--volume exim4:$vol \
+	--env ALIASES=$vol/aliases \
+	--env PREFIX=slp \
+	--env WHO=stuart \
+       	$w
+exec docker logs --follow $w
+
+	#--restart unless-stopped \
+	#--publish 25:25 \
