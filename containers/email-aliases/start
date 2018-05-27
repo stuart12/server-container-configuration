@@ -8,6 +8,7 @@ docker run \
 	--init \
 	--detach \
 	--publish 2223:2222 \
+	--restart unless-stopped \
 	--cap-drop=all \
 	--name $w \
 	--volume exim4:$vol \
@@ -17,6 +18,3 @@ docker run \
 	--mount type=volume,source=email-aliases-ssh-keys,destination=/media/ssh-host-keys,readonly \
 	$w
 exec docker logs --follow $w
-
-	#--restart unless-stopped \
-	#--publish 25:25 \
