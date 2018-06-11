@@ -1,13 +1,39 @@
 # A docker image for https://www.exim.org/ (exim4)
 
-FROM stuart/debian-sid:2018.03.31
+FROM stuart/debian-sid:2018-05-28
 MAINTAINER Stuart Pook
 EXPOSE 25 587
 
+ARG EXIM_USER=Debian-exim
 RUN addgroup --system --gid 376 letsencrypt
-RUN apt-get update -q && \
-	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y && \
-	DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends \
+RUN adduser --system --force-badname --group --home /var/spool/exim4 --uid 945 $EXIM_USER
+RUN set -x && \
+	DEBIAN_FRONTEND=noninteractive && \
+	export DEBIAN_FRONTEND && \
+	apt-get update -q && \
+	apt-get --allow-remove-essential --quiet --yes --auto-remove purge \
+		cpio \
+		debconf-i18n \
+		dmidecode \
+		dmsetup \
+		ifupdown \
+		init \
+		iproute2 \
+		iptables \
+		iputils-ping \
+		isc-dhcp-common \
+		kmod \
+		less \
+		logrotate \
+		nano \
+		procps \
+		rsyslog \
+		tasksel \
+		whiptail \
+		xxd \
+		&& \
+	apt-get upgrade --no-install-recommends -q -y && \
+	apt-get install -q -y --no-install-recommends \
 		equivs \
 		gpg \
 		libmail-gnupg-perl \
@@ -41,13 +67,12 @@ RUN addgroup --gid 500 vmail
 RUN adduser --disabled-password --disabled-login --uid 500 --gid 500 --gecos 'Virtual Email User' vmail
 
 VOLUME /var/spool/exim4
-COPY keys /tmp/keys
+COPY users-public-keys /tmp/keys
 ARG EMAIL_OWNER=vmail
 RUN chown -R $EMAIL_OWNER /tmp/keys
 ARG DKIM_VOL=/etc/exim-dkim
 ARG DKIM_PRIV=$DKIM_VOL/dkim_rsa.private
 
-ARG EXIM_USER=Debian-exim
 RUN \
 	mkdir -m 2755 $DKIM_VOL && \
 	chgrp $EXIM_USER $DKIM_VOL && \
@@ -58,18 +83,20 @@ RUN \
 VOLUME /etc/exim-dkim
 
 RUN apt-get --quiet --yes --auto-remove --allow-remove-essential purge \
-	wget \
-	e2fsprogs \
-	fdisk \
-	login \
-	mount \
-	man-db \
-	findutils \
 	bsdmainutils \
 	bsdutils \
+	e2fsprogs \
+	equivs \
+	fdisk \
+	findutils \
 	hostname \
+	login \
+	man-db \
+	mount \
+	wget \
 	&& true
 RUN apt-get auto-remove --yes
+RUN rm -r /usr/share/man
 COPY exim4 /etc/exim4
 RUN sed -i -e "/^ *dkim_private_key/s@DKIM_PRIV-replaced-by-Dockerfile@$DKIM_PRIV@" /etc/exim4/exim4.conf
 
@@ -85,4 +112,4 @@ CMD [ \
 	"-v", \
 	"-bd" \
 ]
-LABEL version="1.7"
+LABEL version="1.8"

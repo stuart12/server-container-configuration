@@ -21,9 +21,11 @@
 
 ## GPG Keys
 export a [public key](http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/) for each user than you want to encrypt incoming messages for
-and put them in the keys directory
+and put them in the users-public-keys directory
 	gpg --list-keys
 	gpg --export -armor you@example.org
+
+To decrypt use [OpenPGP subkeys](https://wiki.debian.org/Subkeys).
 
 ## checkout [swaks](https://linux.die.net/man/1/swaks) & [mail-tester](https://www.mail-tester.com/)
 	swaks --silent 1 --server smtp3.pook.it:587 --tls --auth-user $AS --auth-password "$PASSWD" --to $COOKIE@mail-tester.com --from someone587@pook.it --header "Subject: hello $(date)" --body "hello Web, the computers are very slow today, Fred"
