@@ -4,7 +4,7 @@
 
 	docker build --tag myproxy . && docker stop proxy && docker rm proxy && ./start-proxy && docker logs --follow proxy
 
-	docker run --interactive --tty --rm --volume letsencrypt-etc:/etc/letsencrypt --volume letsencrypt-run:/run/letsencrypt deliverous/certbot certonly --webroot --webroot-path=/run/letsencrypt --email ${EMAIL?'define EMAIL'} --no-eff-email --domains matrix.pook.it,hh.pook.it,nextcloud.pook.it,ffsync.pook.it,imap3.pook.it,smtp3.pook.it
+	docker run --cap-drop=all --interactive --tty --rm --volume letsencrypt-etc:/etc/letsencrypt --volume letsencrypt-run:/run/letsencrypt deliverous/certbot certonly --webroot --webroot-path=/run/letsencrypt --email ${LETS_ENCRYPT_EMAIL?'define LETS_ENCRYPT_EMAIL'} --no-eff-email --domains matrix.pook.it,hh.pook.it,nextcloud.pook.it,ffsync.pook.it,imap3.pook.it,smtp3.pook.it,etesync.pook.it
 	docker run --rm -it -v letsencrypt-run:/run/letsencrypt -v letsencrypt-etc:/etc/letsencrypt debian
 
 ## renew
