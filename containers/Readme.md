@@ -17,3 +17,9 @@
     sudo ./debootstrap sid sid
     sudo tar --xz -C sid -c . | ssh hh docker import - stuart/debian-sid:$(date --rfc-3339=date)
 
+
+## remove exited containers
+### list
+	docker ps -a -f status=exited
+### remove
+	docker rm $(docker ps -a -f status=exited -q)
