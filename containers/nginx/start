@@ -5,6 +5,11 @@ docker build --tag myproxy .
 docker stop $n
 docker rm proxy
 docker run --detach \
+	--cap-drop=all \
+	--cap-add chown \
+	--cap-add net_bind_service \
+	--cap-add setgid \
+	--cap-add setuid \
 	--network proxy \
 	--ip 192.168.42.2 \
 	--publish 80:80 \
