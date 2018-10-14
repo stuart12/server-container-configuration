@@ -1,0 +1,88 @@
+#!/usr/bin/python3
+# dcim-read Copyright (C) 2018 Stuart Pook (http://www.pook.it/)
+# Prune a matrix-synapse server: remote_content
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# https://github.com/matrix-org/synapse/blob/master/docs/admin_api/purge_remote_media.rst
+# https://github.com/matrix-org/synapse/blob/master/docs/admin_api/purge_history_api.rst
+# https://matrix.org/docs/spec/client_server/unstable.html
+
+import argparse
+import urllib.request
+import urllib.parse
+import hashlib
+import logging
+import json
+import time
+
+def send(url, values):
+    data = values.encode('ascii')
+    req = urllib.request.Request(url, data)
+    with urllib.request.urlopen(req) as f:
+        return json.loads(f.read().decode('utf-8'))
+
+def get_access_token(server, user, passwd):
+    logging.info("connect to %s as %s with %s", server, user, hashlib.md5(passwd.encode('utf-8')).hexdigest())
+    values = {'type': 'm.login.password', 'user': user, 'password': passwd}
+    json_response = send(server + 'login', json.dumps(values))
+    return json_response['access_token']
+
+def timestamp(now, days):
+    return int((now - days * 24 * 60 * 60) * 1000)
+
+def prune_remote_content(server, token, remote_days, now):
+    when = timestamp(now, remote_days)
+    values = {'before_ts': when, 'access_token': token}
+    logging.info("pruning on %s at %f days, %d ms since 1/1/1970", server, remote_days, when)
+    deleted = send(server + 'admin/purge_media_cache',  urllib.parse.urlencode(values))['deleted']
+    print(deleted)
+
+def logout(server, token):
+    values = {'access_token': token}
+    logging.info("logout on %s", server)
+    send(server + 'logout',  urllib.parse.urlencode(values))
+
+def prune(server, user, passwd, remote_days=1000):
+    now = time.time()
+    url = server + '/_matrix/client/r0/'
+    token = get_access_token(url, user, passwd)
+    prune_remote_content(url, token, remote_days, now)
+    #prune_remote_events(url, token, remote_days, now)
+    logout(url, token)
+
+def read_and_run(credentials, remote_days, remote_events):
+    with open(credentials) as f:
+        for line in f.readlines():
+            prune(*line.strip().split(maxsplit=2), remote_days=remote_days)
+
+def main():
+    parser = argparse.ArgumentParser(allow_abbrev=False,
+            description="prune remote content in a matrix-synapse instance",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-v", "--verbose", dest='loglevel',
+            action='store_const', const='info', default='warn', help='set log level to info')
+    parser.add_argument("--remote_content", metavar="DAYS", type=float, default=31, help="purge remote content not accessed in DAYS")
+    parser.add_argument("--remote_events", metavar="DAYS", type=float, default=310, help="purge remote events DAYS old")
+    parser.add_argument('credentials', metavar="FILE", help='server user password')
+
+    args = parser.parse_args()
+    loglevel = args.loglevel
+    numeric_level = getattr(logging, loglevel.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError('Invalid log level: %s' % loglevel)
+    logging.basicConfig(level=numeric_level)
+
+    read_and_run(args.credentials, args.remote_content, args.remote_events)
+
+if __name__ == '__main__':
+    main()
