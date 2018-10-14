@@ -1,4 +1,4 @@
-FROM stuart/debian-sid:2018.03.31
+FROM stuart/debian-sid:latest
 MAINTAINER Stuart Pook
 EXPOSE 8448
 EXPOSE 8008
@@ -9,6 +9,7 @@ ARG TURN_SECRET
 
 RUN apt-get update -q
 RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y
+RUN adduser --system --home /var/lib/matrix-synapse --uid 800 --group matrix-synapse
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends matrix-synapse python-psycopg2
 RUN apt-get --purge -q -y --allow-remove-essential remove \
 	bash \
