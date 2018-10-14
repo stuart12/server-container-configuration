@@ -16,7 +16,7 @@
     chmod 755 debootstrap
     sudo ./debootstrap sid sid
     sudo tar --xz -C sid -c . | ssh hh docker import - stuart/debian-sid:$(date --rfc-3339=date)
-
+    ssh hh docker tag stuart/debian-sid:$(date --rfc-3339=date) stuart/debian-sid:latest
 
 ## remove exited containers
 ### list
