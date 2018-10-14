@@ -27,10 +27,18 @@ import time
 
 def send(url, values):
     logging.info("sending to %s", url)
+    logging.debug("sedning %s %s", url, values)
     data = values.encode('ascii')
     req = urllib.request.Request(url, data)
     with urllib.request.urlopen(req) as f:
         return json.loads(f.read().decode('utf-8'))
+
+def check(url, values):
+    try:
+        return send(url, values)
+    except urllib.error.URLError as ex:
+        logging.error("URLError %s %s", ex, ex.read())
+        exit(5)
 
 def get_access_token(server, user, passwd):
     logging.info("connect to %s as %s with %s", server, user, hashlib.md5(passwd.encode('utf-8')).hexdigest())
@@ -45,26 +53,58 @@ def prune_remote_content(server, token, remote_days, now):
     when = timestamp(now, remote_days)
     values = {'before_ts': when, 'access_token': token}
     logging.info("pruning on %s at %f days, %d ms since 1/1/1970", server, remote_days, when)
-    deleted = send(server + 'admin/purge_media_cache',  urllib.parse.urlencode(values))['deleted']
+    deleted = check(server + 'admin/purge_media_cache',  urllib.parse.urlencode(values))['deleted']
     print(deleted)
+
+def get_purge_status(url, token, purge_id):
+    at = {'access_token': token}
+    full_url = url + 'admin/purge_history_status/' + purge_id + '?' + urllib.parse.urlencode(at)
+    req = urllib.request.Request(full_url)
+    with urllib.request.urlopen(req) as f:
+        status = json.loads(f.read().decode('utf-8'))['status']
+        logging.info("status %s %s", url, status)
+        return status
+
+def prune_remote_events(url, token, remote_days, now, rooms, history_poll_delay):
+    at = {'access_token': token}
+    values = {'purge_up_to_ts': timestamp(now, remote_days)}
+    for room in rooms:
+        try:
+            res = send(url + 'admin/purge_history/' + room + "?" + urllib.parse.urlencode(at), json.dumps(values))
+        except urllib.error.URLError as ex:
+            if json.loads(ex.read())['errcode'] == 'M_NOT_FOUND':
+                logging.warn("no events found for %s", room)
+            else:
+                logging.error("URLError %s %s", ex, ex.read())
+                exit(1)
+        else:
+            logging.warn("EVENTS found for %s %s", room, res)
+            purge_id = res['purge_id']
+            while True:
+                time.sleep(history_poll_delay)
+                status = get_purge_status(url, token, purge_id)
+                if status != 'active':
+                    if status != 'complete':
+                        logging.error("history purge on %s gave %s", room, status)
+                    break
 
 def logout(server, token):
     values = {'access_token': token}
     logging.info("logout on %s", server)
     send(server + 'logout',  urllib.parse.urlencode(values))
 
-def prune(server, user, passwd, remote_days=1000):
+def prune(server, user, passwd, remote_days=1000, rooms=[], history_poll_delay=300):
     now = time.time()
     url = server + '/_matrix/client/r0/'
     token = get_access_token(url, user, passwd)
+    prune_remote_events(url, token, remote_days, now, rooms, history_poll_delay)
     prune_remote_content(url, token, remote_days, now)
-    #prune_remote_events(url, token, remote_days, now)
     logout(url, token)
 
-def read_and_run(credentials, remote_days, remote_events):
+def read_and_run(credentials, remote_days, remote_events, rooms, history_poll_delay=3000):
     with open(credentials) as f:
         for line in f.readlines():
-            prune(*line.strip().split(maxsplit=2), remote_days=remote_days)
+            prune(*line.strip().split(maxsplit=2), remote_days=remote_days, rooms=rooms, history_poll_delay=history_poll_delay)
 
 def main():
     parser = argparse.ArgumentParser(allow_abbrev=False,
@@ -72,9 +112,14 @@ def main():
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-v", "--verbose", dest='loglevel',
             action='store_const', const='info', default='warn', help='set log level to info')
+    parser.add_argument("-d", "--debug", dest='loglevel',
+            action='store_const', const='debug', default='warn', help='set log level to debug')
     parser.add_argument("--remote_content", metavar="DAYS", type=float, default=31, help="purge remote content not accessed in DAYS")
-    parser.add_argument("--remote_events", metavar="DAYS", type=float, default=310, help="purge remote events DAYS old")
+    parser.add_argument("--remote_events", metavar="DAYS", type=float, default=31, help="purge remote events DAYS old")
+    parser.add_argument('-P', "--events_poll", metavar="SECONDS", type=float, default=10, help="delay for polling for event purge")
     parser.add_argument('credentials', metavar="FILE", help='server user password')
+    # to get the room ids: psql -P pager=off --dbname=matrix -c "SELECT room_id from rooms"
+    parser.add_argument('room', metavar="ROOM_ID", nargs=argparse.REMAINDER, help='matrix room ids')
 
     args = parser.parse_args()
     loglevel = args.loglevel
@@ -83,7 +128,7 @@ def main():
         raise ValueError('Invalid log level: %s' % loglevel)
     logging.basicConfig(level=numeric_level)
 
-    read_and_run(args.credentials, args.remote_content, args.remote_events)
+    read_and_run(args.credentials, args.remote_content, args.remote_events, rooms=args.room, history_poll_delay=args.events_poll)
 
 if __name__ == '__main__':
     main()
