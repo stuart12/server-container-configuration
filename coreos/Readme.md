@@ -1,4 +1,8 @@
 # Random notes on how to use ignition to configure a CoreOS Instance
+## add options to rootfs for TRIM and compression
+edited /usr/share/oem/grub.cfg, added "rootflags=rw,discard,compress=zstd" but should
+follow [Kernel modules / sysctl parameters](https://coreos.com/os/docs/latest/other-settings.html)
+section "Adding custom kernel boot options".
 
 ## Fix problem default route via eth1 on HostHatch.com
 
