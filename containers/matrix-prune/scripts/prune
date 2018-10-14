@@ -26,6 +26,7 @@ import json
 import time
 
 def send(url, values):
+    logging.info("sending to %s", url)
     data = values.encode('ascii')
     req = urllib.request.Request(url, data)
     with urllib.request.urlopen(req) as f:
