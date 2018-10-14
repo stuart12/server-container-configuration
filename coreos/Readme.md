@@ -26,3 +26,6 @@ Need to delete it on the console:
 	sudo btrfs subvol create /snapshots
 	sudo btrfs subvol create /snapshots/rootfs
 	sudo btrfs subvol snapshot -r / /snapshots/rootfs/first
+
+## create snapshpt
+    sudo btrfs subvol snapshot -r / /snapshots/rootfs/$(date -Iseconds)
