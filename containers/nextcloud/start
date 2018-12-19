@@ -2,24 +2,25 @@
 # https://github.com/nextcloud/docker
 . ./passwords
 w=nextcloud
-docker kill $w || true
+docker stop $w || true
 docker rm $w || true
+version=15 # only increase versions one at a time
 docker run \
 	--detach \
-	--volume nextcloud_app:/var/www/html \
-	--volume nextcloud_apps:/var/www/html/custom_apps \
-	--volume nextcloud_config:/var/www/html/config \
-	--volume nextcloud_data:/var/www/html/data \
-	--network mariadb \
+	--volume nextcloud_app2:/var/www/html \
+	--volume nextcloud_apps2:/var/www/html/custom_apps \
+	--volume nextcloud_config2:/var/www/html/config \
+	--volume nextcloud_data2:/var/www/html/data \
+	--network postgresql \
 	--name $w \
-	--env MYSQL_DATABASE=nextcloud \
-	--env MYSQL_USER=nextcloud \
-	--env MYSQL_PASSWORD="${MYSQL_PASSWORD?}" \
-	--env MYSQL_HOST=mariadb \
+	--env POSTGRES_DB=nextcloud \
+	--env POSTGRES_USER=nextcloud \
+	--env POSTGRES_PASSWORD="${POSTGRES_PASSWORD=?}" \
+	--env POSTGRES_HOST=postgresql \
 	--env NEXTCLOUD_ADMIN_USER=slpadmin \
 	--env NEXTCLOUD_ADMIN_PASSWORD="${NEXTCLOUD_ADMIN_PASSWORD?}" \
 	--restart unless-stopped \
-	$w
+	$w:$version
 
 docker network connect proxy $w
 docker logs --follow $w
