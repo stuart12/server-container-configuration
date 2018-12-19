@@ -5,8 +5,13 @@ w=nextcloud
 docker stop $w || true
 docker rm $w || true
 version=15 # only increase versions one at a time
+docker pull $w:$version
 docker run \
 	--detach \
+	--cap-drop=all \
+	--cap-add net_bind_service \
+	--cap-add setgid \
+	--cap-add setuid \
 	--volume nextcloud_app2:/var/www/html \
 	--volume nextcloud_apps2:/var/www/html/custom_apps \
 	--volume nextcloud_config2:/var/www/html/config \
