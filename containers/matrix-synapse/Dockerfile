@@ -7,17 +7,20 @@ ENV SYNAPSE_CACHE_FACTOR=0.01
 ARG DATABASE_PASSWORD
 ARG TURN_SECRET
 
+COPY apt/stable.list /etc/apt/sources.list.d/stable.list
 RUN apt-get update -q
 RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y
 RUN adduser --system --home /var/lib/matrix-synapse --uid 800 --group matrix-synapse
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends matrix-synapse python-psycopg2
-RUN apt-get --purge -q -y --allow-remove-essential remove \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y python3-prometheus-client/stable
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y matrix-synapse
+RUN DEBIAN_FRONTEND=noninteractive apt-get --purge -q -y --allow-remove-essential remove \
 	bash \
 	e2fsprogs \
 	fdisk \
 	login \
 	mount \
 	&& true
+RUN apt-get -y -q autoremove
 RUN apt-get clean
 
 COPY synapse /etc/matrix-synapse/conf.d
@@ -35,6 +38,7 @@ RUN echo 'server_name: "'$DOMAIN'"' > /etc/matrix-synapse/conf.d/server.yaml
 RUN (echo -n 'registration_shared_secret: "'; tr -dc '[#-[^~!]' < /dev/urandom | dd status=none bs=6 count=7; echo '"') > /etc/matrix-synapse/conf.d/registration.yaml
 RUN echo 'turn_uris: ["turn:turn.'$DOMAIN':3478?transport=udp", "turn:turn.'$DOMAIN':3478?transport=tcp" ]' > /etc/matrix-synapse/conf.d/turn_uris.yaml
 RUN chown root /etc/matrix-synapse
+RUN sed -i -e /msgpack-python/s/-python// -e /pymacaroons-pynacl/s/-pynacl// /usr/lib/python3/dist-packages/synapse/python_dependencies.py
 
 USER matrix-synapse
 RUN mkdir /var/lib/matrix-synapse/media

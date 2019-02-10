@@ -1,0 +1,9 @@
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+
+Package: pymacaroons-pynacl
+Version: 0.9.3
+Maintainer: Stuart Pook <your@email.address>
+Architecture: all
+Description: fake python3-pymacaroons-pynacl for bad check in matrix-synapse 0.34.1.1-1

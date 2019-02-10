@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/sh -x
 umask 077
-cmd="/usr/bin/python -m synapse.app.homeserver --config-path=/etc/matrix-synapse/homeserver.yaml --config-path=/etc/matrix-synapse/conf.d/"
+cmd="/usr/bin/python3 -m synapse.app.homeserver --config-path=/etc/matrix-synapse/homeserver.yaml --config-path=/etc/matrix-synapse/conf.d/"
 $cmd --generate-keys
 case "$*" in
 "")
