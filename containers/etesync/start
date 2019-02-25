@@ -1,17 +1,15 @@
-#!/bin/sh -ex
-w=etesync
-docker build --tag $w .
-docker kill $w || true
-docker rm $w || true
+docker build --tag etesync "$@" . # --no-cache
+docker stop etesync || true
+docker rm etesync || true
 docker run --init \
 	--detach \
 	--network proxy \
-	--name $w \
+	--name etesync \
 	--cap-drop=all \
 	--mount type=volume,source=etesync-db,destination=/db \
-       	$w
-#docker network connect --ip 192.168.42.1 proxy $w
-docker logs --follow $w
+	etesync
+#docker network connect --ip 192.168.42.1 proxy etesync
+docker logs --follow etesync
 exit 0
 
 	--restart unless-stopped \
