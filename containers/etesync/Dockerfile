@@ -53,6 +53,7 @@ ARG PROGRAM_DIR=/etesync
 RUN set -x && \
 	umask 22 && \
 	git clone https://github.com/etesync/server-skeleton.git $PROGRAM_DIR && \
+	pip3 install wheel && \
 	pip3 install -r $PROGRAM_DIR/requirements.txt && \
 	true
 
