@@ -38,7 +38,7 @@ RUN echo 'server_name: "'$DOMAIN'"' > /etc/matrix-synapse/conf.d/server.yaml
 RUN (echo -n 'registration_shared_secret: "'; tr -dc '[#-[^~!]' < /dev/urandom | dd status=none bs=6 count=7; echo '"') > /etc/matrix-synapse/conf.d/registration.yaml
 RUN echo 'turn_uris: ["turn:turn.'$DOMAIN':3478?transport=udp", "turn:turn.'$DOMAIN':3478?transport=tcp" ]' > /etc/matrix-synapse/conf.d/turn_uris.yaml
 RUN chown root /etc/matrix-synapse
-RUN sed -i -e /msgpack-python/s/-python// -e /pymacaroons-pynacl/s/-pynacl// /usr/lib/python3/dist-packages/synapse/python_dependencies.py
+#RUN sed -i -e /msgpack-python/s/-python// -e /pymacaroons-pynacl/s/-pynacl// /usr/lib/python3/dist-packages/synapse/python_dependencies.py
 
 USER matrix-synapse
 RUN mkdir /var/lib/matrix-synapse/media
