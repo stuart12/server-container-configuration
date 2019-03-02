@@ -5,7 +5,6 @@ docker build "$@" --tag $w .
 docker stop $w || true
 docker rm $w
 docker run \
-	--publish 8448:8448 \
 	--restart unless-stopped \
 	--name matrix-synapse \
 	--detach \

@@ -24,9 +24,6 @@ RUN apt-get -y -q autoremove
 RUN apt-get clean
 
 COPY synapse /etc/matrix-synapse/conf.d
-COPY keys/homeserver.tls.dh /etc/matrix-synapse/
-COPY keys/homeserver.tls.crt /etc/matrix-synapse/
-COPY keys/homeserver.tls.key /etc/matrix-synapse/
 COPY keys/homeserver.signing.key /etc/matrix-synapse/
 COPY keys/turn_secret.yaml /etc/matrix-synapse/conf.d/
 COPY keys/macaroon_secret_key.yaml /etc/matrix-synapse/conf.d/

@@ -1,5 +1,10 @@
 # Hints
 
+## redirect to hh.pook.it
+This configuration also requires creating
+https://pook.it/.well-known/matrix/server which must contain
+`{"m.server":"hh.pook.it"}`.
+
 ## build the image
 	docker build --tag matrix-synapse .
 ## run the image

@@ -13,6 +13,7 @@ docker run --detach \
 	--network proxy \
 	--ip 192.168.42.2 \
 	--publish 80:80 \
+	--publish 8448:8448 \
 	--publish 443:443 \
 	--publish 143:143 \
 	--volume letsencrypt-etc:/etc/letsencrypt:ro \

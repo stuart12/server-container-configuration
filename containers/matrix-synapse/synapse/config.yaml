@@ -9,13 +9,13 @@ uploads_path: /var/lib/matrix-synapse/uploads
 # configuration.
 listeners:
   # Main HTTPS listener
-  # For when matrix traffic is sent directly to synapse.
+  # For when matrix traffic passes through loadbalancer that unwraps TLS.
   -
     port: 8448
     bind_address: ''
     type: http
-    tls: true
-    x_forwarded: false
+    tls: false
+    x_forwarded: true
 
     # List of HTTP resources to serve on this listener.
     resources:
