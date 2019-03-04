@@ -1,9 +1,9 @@
 # Hints
 
-## redirect to hh.pook.it
+## redirect to matrix server
 This configuration also requires creating
 https://pook.it/.well-known/matrix/server which must contain
-`{"m.server":"hh.pook.it"}`.
+`{"m.server":"matrix.pook.it"}`.
 
 ## build the image
 	docker build --tag matrix-synapse .
@@ -32,6 +32,11 @@ https://pook.it/.well-known/matrix/server which must contain
 
 ## get list of rooms
     docker exec --tty -i postgresql psql -P pager=off --dbname=matrix -c "SELECT room_id from rooms"
+
+## check federation setup
+Run [Matrix Federation Tester](https://matrix.org/federationtester/) on `pook.it`.
+
+[Matrix Federation Tester API](https://matrix.org/federationtester/api/report?server_name=pook.it)
 
 # TODO
 - generate a new registration key at each server start
