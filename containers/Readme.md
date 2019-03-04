@@ -6,6 +6,8 @@
 		apt update && apt install -y -q telnet openssl
 
 ## clean up docker disk usage
+make sure all containers are running before running this command
+
 [https://docs.docker.com/engine/reference/commandline/system_prune/](docker system prune)
     docker system prune --volumes
 
