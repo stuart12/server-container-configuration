@@ -16,6 +16,8 @@
 import os
 import sys
 import argparse
+import random
+import socket
 
 def myname():
     return sys.argv[0]
@@ -69,6 +71,29 @@ def add_alias(alias, destination, aliases, prefix, who, aliases_filename):
     check_destination(destination, alias, who)
     update_file(aliases_filename, alias, destination)
 
+def validate_destination(destination, aliases):
+    try:
+        socket.gethostbyname(destination)
+    except socket.gaierror as ex:
+        error(destination, ex)
+        sys.exit(6)
+    for a, d in aliases.items():
+        fields = d.split('-')
+        if len(fields) == 4 and destination == d.split('-')[3]:
+            error("destination", destination, "already exists as", a)
+
+def create_alias(destination, aliases, prefix, who, aliases_filename):
+    validate_destination(destination, aliases)
+
+    digits = 6
+    while True:
+        number = random.randrange(0, 10 ** digits - 1)
+        alias = "%s%0*d" % (prefix, digits, number)
+        if not alias in aliases:
+            break
+    result = "%s-alias-%s-%s" % (who, alias, destination)
+    update_file(aliases_filename, alias, result)
+
 def run(alias_file, prefix, who, aliases_filename, request):
     aliases = read_alias(alias_file)
     if request is None:
@@ -76,15 +101,14 @@ def run(alias_file, prefix, who, aliases_filename, request):
     else:
         parts = request.split(':')
         if len(parts) == 1:
-            create_alias(parts[0])
+            create_alias(parts[0].strip(), aliases, prefix, who, aliases_filename)
         elif len(parts) == 2:
             add_alias(parts[0].strip(), parts[1].strip(), aliases, prefix, who, aliases_filename)
         else:
             error("too many fields in request", parts)
-    
 
 def get_environment():
-    env = '/proc/1/environ'
+    env = os.environ.get('SELF', '/proc/1/environ')
     r = {}
     with open(env, 'rb') as f:
         for v in f.read().split(b'\0'):
