@@ -18,6 +18,7 @@ import sys
 import argparse
 import random
 import socket
+import logging
 
 def myname():
     return sys.argv[0]
@@ -91,6 +92,7 @@ def create_alias(destination, aliases, prefix, who, aliases_filename):
         alias = "%s%0*d" % (prefix, digits, number)
         if not alias in aliases:
             break
+        logging.debug("collision with %s", alias)
     result = "%s-alias-%s-%s" % (who, alias, destination)
     update_file(aliases_filename, alias, result)
 
@@ -132,9 +134,20 @@ def main():
     prefix = getenv(env, 'PREFIX')
     who = getenv(env, 'WHO')
     parser = argparse.ArgumentParser(description='add an alias or print them all')
-    parser.add_argument("-c", dest="create", help="alias to create")
+    parser.set_defaults(loglevel='warn')
+    parser.add_argument("-v", "--verbose", dest='loglevel', action="store_const", const='debug', help="debug loglevel")
+    parser.add_argument("-l", "--loglevel", metavar="LEVEL", help="set logging level")
+
+    parser.add_argument("--create", "-c", help="alias to create")
+    parser.add_argument("--seed", type=int, help="seed random number generator")
 
     args = parser.parse_args()
+    numeric_level = getattr(logging, args.loglevel.upper(), None)
+    logging.basicConfig(level=numeric_level)
+
+    if args.seed is not None:
+        logging.debug("seeding random number generator with %d", args.seed)
+        random.seed(args.seed)
     run(aliases, prefix, who, aliases, args.create)
 
 if __name__ == '__main__':
