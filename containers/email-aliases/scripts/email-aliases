@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# email-aliases Copyright (C) 2018 Stuart Pook (http://www.pook.it/)
+# email-aliases Copyright (C) 2018-2019 Stuart Pook (http://www.pook.it/)
 # Print or add aliases for exmi4
 #
 # This program is free software: you can redistribute it and/or modify it under
@@ -37,9 +37,9 @@ def read_alias(aliases):
             r[parts[0].strip()] = parts[1].strip()
     return r
 
-def dump(aliases):
+def dump(aliases, domain):
     for k, v in aliases.items():
-        print(k, ":", v)
+        print(k + domain, ":", v)
 
 def check_alias(alias, prefix):
     if not alias.startswith(prefix):
@@ -48,7 +48,6 @@ def check_alias(alias, prefix):
         error("new alias", alias, "too short")
 
 def check_destination(destination, alias, who):
-    # TODO: check no alias to base destination exists
     prefix = who + "-alias-" + alias + "-"
     if not destination.startswith(prefix):
         error("new destination", destination, "does not start with", prefix)
@@ -59,7 +58,6 @@ def update_file(aliases_filename, alias, destination):
     out = alias + ": " + destination
     with open(aliases_filename, "a") as aliases:
         print(out, file=aliases)
-    print(out)
 
 def add_alias(alias, destination, aliases, prefix, who, aliases_filename):
     dest = aliases.get(alias, None)
@@ -83,7 +81,7 @@ def validate_destination(destination, aliases):
         if len(fields) == 4 and destination == d.split('-')[3]:
             error("destination", destination, "already exists as", a)
 
-def create_alias(destination, aliases, prefix, who, aliases_filename):
+def create_alias(destination, aliases, prefix, who, aliases_filename, domain):
     validate_destination(destination, aliases)
 
     digits = 6
@@ -95,24 +93,30 @@ def create_alias(destination, aliases, prefix, who, aliases_filename):
         logging.debug("collision with %s", alias)
     result = "%s-alias-%s-%s" % (who, alias, destination)
     update_file(aliases_filename, alias, result)
+    print(alias + domain + " : " + result)
 
-def run(alias_file, prefix, who, aliases_filename, request):
+def run(alias_file, prefix, who, aliases_filename, request, domain):
     aliases = read_alias(alias_file)
     if request is None:
-        dump(aliases)
+        dump(aliases, domain)
     else:
         parts = request.split(':')
         if len(parts) == 1:
-            create_alias(parts[0].strip(), aliases, prefix, who, aliases_filename)
+            create_alias(parts[0].strip(), aliases, prefix, who, aliases_filename, domain)
         elif len(parts) == 2:
             add_alias(parts[0].strip(), parts[1].strip(), aliases, prefix, who, aliases_filename)
         else:
             error("too many fields in request", parts)
 
+def open_env():
+    try:
+        return open('/proc/1/environ', 'rb')
+    except:
+        return open('/proc/self/environ', 'rb')
+
 def get_environment():
-    env = os.environ.get('SELF', '/proc/1/environ')
     r = {}
-    with open(env, 'rb') as f:
+    with open_env() as f:
         for v in f.read().split(b'\0'):
             decoded = v.decode('ascii')
             if decoded:
@@ -139,6 +143,7 @@ def main():
     parser.add_argument("-l", "--loglevel", metavar="LEVEL", help="set logging level")
 
     parser.add_argument("--create", "-c", help="alias to create")
+    parser.add_argument("--domain", "-D", help="domain for printing")
     parser.add_argument("--seed", type=int, help="seed random number generator")
 
     args = parser.parse_args()
@@ -148,7 +153,8 @@ def main():
     if args.seed is not None:
         logging.debug("seeding random number generator with %d", args.seed)
         random.seed(args.seed)
-    run(aliases, prefix, who, aliases, args.create)
+    domain = "@%s" % args.domain if args.domain else ""
+    run(aliases, prefix, who, aliases, args.create, domain)
 
 if __name__ == '__main__':
     main()
