@@ -58,22 +58,20 @@ RUN set -x && \
 	true
 
 ARG USER=etesync
+ARG DB_DIR=/db
 
 RUN set -x && \
 	adduser --system --group --uid 900 $USER && \
 	cd $PROGRAM_DIR && \
-	sed -i -e '/^ALLOWED_HOSTS/s/.$/"etesync.pook.it"&/' etesync_server/settings.py && \
+	sed -i -e '/^\[allowed_hosts\]/aallowed_host1 = etesync.pook.it' -e "/^name = /s@=.*@= $DB_DIR/etesync.sqlite3@" etesync-server.ini && \
 	dd bs=40 count=1 if=/dev/urandom status=none | sha1sum | cut -f1 -d ' ' > secret.txt && \
 	chown $USER secret.txt && \
 	: Set secret.txt not readable so etesync will create a new secret each time it is run && \
 	chmod 200 secret.txt && \
 	true
 
-ARG DB_DIR=/db
-
 RUN mkdir -m 700 $DB_DIR && chown $USER $DB_DIR && date > $DB_DIR/etesync-db-container
 VOLUME $DB_DIR
-ENV ETESYNC_DB_PATH=$DB_DIR/etesync.sqlite3
 
 ENV LISTEN_PORT=8000
 EXPOSE $LISTEN_PORT
