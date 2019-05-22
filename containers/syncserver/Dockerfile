@@ -40,6 +40,8 @@ COPY --from=0 /opt/syncserver/syncserver.wsgi /opt/syncserver/.
 COPY --from=0 /opt/syncserver/syncserver.ini $CONFIG
 RUN head -c 20 /dev/urandom | sha1sum | sed -e 's/ .*//' -e 's/^/secret = /' >> $CONFIG
 #RUN echo allow_new_users = false >> $CONFIG
+ARG DBPASSWD
+RUN echo sqluri_ = postgresql://mozillasync:$DBPASSWD@postgresql:5432/mozillasync >> $CONFIG
 RUN echo sqluri = sqlite:////tmp/syncserver.db >> $CONFIG
 WORKDIR /opt/syncserver
 

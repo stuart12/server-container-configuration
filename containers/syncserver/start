@@ -1,15 +1,16 @@
 #!/bin/sh -xe
-docker build --tag syncserver "$@" . # --no-cache
-docker stop syncserver || true
-docker rm syncserver || true
+. ./secrets.sh
+# https://vsupalov.com/docker-build-time-env-values/
+docker build --build-arg DBPASSWD=${DBPASSWD?} --tag mozillasync "$@" . # --no-cache
+docker stop mozillasync || true
+docker rm mozillasync || true
 docker run --init \
 	--detach \
-	--network proxy \
-	--name syncserver \
+	--network postgresql \
+	--name mozillasync \
 	--cap-drop=all \
 	--restart unless-stopped \
-	syncserver # -xc "sleep 23423d"
-#docker network connect --ip 192.168.42.1 proxy etesync
-docker logs --follow syncserver
+	mozillasync # -xc "sleep 23423d"
+docker network connect proxy mozillasync
+docker logs --follow mozillasync
 exit 0
-	--mount type=volume,source=etesync-db,destination=/db \
