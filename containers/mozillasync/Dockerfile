@@ -2,6 +2,7 @@
 
 # use any Debian sid image
 FROM stuart/debian-base
+ARG USER=builder
 LABEL maintainer "Stuart Pook"
 EXPOSE 5000
 
@@ -14,18 +15,23 @@ RUN apt-get install -q -y --no-install-recommends \
 	python-virtualenv \
 	make \
 	g++ \
+	libpq-dev \
 	&& true
 WORKDIR /opt
+RUN adduser --disabled-password --disabled-login --no-create-home --uid 1023 --gecos Builder $USER
+RUN chown $USER /opt
+USER $USER
 RUN git clone https://github.com/mozilla-services/syncserver
 WORKDIR /opt/syncserver
 RUN make build test
+RUN ./local/bin/pip install psycopg2
 
 # https://docs.docker.com/develop/develop-images/multistage-build/
 FROM stuart/debian-base
 
 RUN apt-get update -q 
 RUN apt-get dist-upgrade -q -y
-RUN apt-get install -q -y --no-install-recommends python2.7
+RUN apt-get install -q -y --no-install-recommends python2.7 libpq5
 RUN apt-get clean
 
 ARG USER=syncserver
@@ -41,8 +47,8 @@ COPY --from=0 /opt/syncserver/syncserver.ini $CONFIG
 RUN head -c 20 /dev/urandom | sha1sum | sed -e 's/ .*//' -e 's/^/secret = /' >> $CONFIG
 #RUN echo allow_new_users = false >> $CONFIG
 ARG DBPASSWD
-RUN echo sqluri_ = postgresql://mozillasync:$DBPASSWD@postgresql:5432/mozillasync >> $CONFIG
-RUN echo sqluri = sqlite:////tmp/syncserver.db >> $CONFIG
+RUN echo sqluri = postgresql://mozillasync:$DBPASSWD@postgresql:5432/mozillasync >> $CONFIG
+#RUN echo sqluri = sqlite:////tmp/syncserver.db >> $CONFIG
 WORKDIR /opt/syncserver
 
 USER $USER
