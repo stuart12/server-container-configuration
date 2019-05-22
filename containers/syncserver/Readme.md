@@ -22,3 +22,5 @@
 	    </Directory>
     </VirtualHost>
 
+## bash in container
+	docker exec --interactive --tty syncserver  /bin/bash
