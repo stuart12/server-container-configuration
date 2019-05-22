@@ -1,0 +1,4 @@
+#!/bin/sh -ex
+cd $(dirname "$0")
+docker build "$@" --tag stuart/debian-base .
+docker run -it --rm stuart/debian-base
