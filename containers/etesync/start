@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -xe
 docker build --tag etesync "$@" . # --no-cache
 docker stop etesync || true
 docker rm etesync || true
@@ -9,7 +9,7 @@ docker run --init \
 	--cap-drop=all \
 	--mount type=volume,source=etesync-db,destination=/db \
 	--restart unless-stopped \
-	etesync
+	etesync # -xc 'sleep 23d'
 #docker network connect --ip 192.168.42.1 proxy etesync
 docker logs --follow etesync
 exit 0
