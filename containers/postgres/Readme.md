@@ -13,6 +13,8 @@ core@stuart1 ~/github.com/server-container-configuration/containers $ docker net
 	docker exec -i  postgresql createuser matrix --pwprompt
 	docker exec -ti  postgresql createdb matrix
 	docker exec -i postgresql  psql
+		grant all privileges on database mozillasync to mozillasync;
+	docker exec -i postgresql  psql
 		 alter user  "matrix-synapse" with  ENCRYPTED password 'foobar';
 	bzip2 -d < ~/postgres.dump.bz2 | docker exec -i postgresql psql  --set ON_ERROR_STOP=on matrix
 ## check & set restart policy
