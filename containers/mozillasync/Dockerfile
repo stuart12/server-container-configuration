@@ -45,14 +45,20 @@ COPY --from=0 /opt/syncserver/syncserver.egg-info /opt/syncserver/syncserver.egg
 COPY --from=0 /opt/syncserver/syncserver.wsgi /opt/syncserver/.
 COPY --from=0 /opt/syncserver/syncserver.ini $CONFIG
 RUN head -c 20 /dev/urandom | sha1sum | sed -e 's/ .*//' -e 's/^/secret = /' >> $CONFIG
-#RUN echo allow_new_users = false >> $CONFIG
+RUN echo allow_new_users = false >> $CONFIG
 ARG DBPASSWD
-RUN echo sqluri = postgresql://mozillasync:$DBPASSWD@postgresql:5432/mozillasync >> $CONFIG
-#RUN echo sqluri = sqlite:////tmp/syncserver.db >> $CONFIG
+RUN echo sqluri = "postgresql://mozillasync:$DBPASSWD@postgresql:5432/mozillasync" >> $CONFIG
+RUN sed -i -e '/^public_url/d' $CONFIG
+RUN echo public_url = https://mozillasync.pook.it >> $CONFIG
+RUN sed -i -e '/^workers/s/.*/workers = 2/' $CONFIG
+RUN sed -i -e '/^timeout/s/.*/timeout = 60/' $CONFIG
+RUN sed -e '/^#/d' -e '/^$/d' $CONFIG
 WORKDIR /opt/syncserver
 
+# http://docs.gunicorn.org/en/stable/settings.html
+RUN echo "exec ./local/bin/gunicorn --log-level debug --forwarded-allow-ips=127.0.0.1,192.168.42.2 --paste $CONFIG syncserver.wsgi_app" > /opt/syncserver/start.sh
 USER $USER
 ENTRYPOINT [ "/bin/sh" ]
-CMD [ "-xc", "exec ./local/bin/gunicorn --forwarded-allow-ips=127.0.0.1,172.17.0.1 --paste /etc/syncserver.ini syncserver.wsgi_app" ]
+CMD [ "-xc", ". /opt/syncserver/start.sh" ]
 
-LABEL version "1.1"
+LABEL version "1.2"
