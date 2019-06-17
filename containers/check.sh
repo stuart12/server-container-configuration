@@ -7,7 +7,7 @@ check(){
 }
 check nextcloud
 check hh
-check ffsync
+check mozillasync
 check etesync
 check smtp3 submission smtp
 check imap3 imap imap
