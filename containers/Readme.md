@@ -5,6 +5,8 @@
 	docker run -it --rm --network proxy stuart/debian-sid:2018.03.31
 		apt update && apt install -y -q telnet openssl
 
+## show dangling volumes
+	docker volume ls --filter dangling=true
 ## clean up docker disk usage
 make sure all containers are running before running this command
 
