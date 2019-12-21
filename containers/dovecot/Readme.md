@@ -67,9 +67,11 @@ You will be able to reach foo and bar from each other using DNS entries correspo
 	apt install -y openssl
 	openssl s_client -connect proxy:143 -starttls imap
 
-## change password
+## passwords (passwd)
+hash a new password
 	doveadm pw -s SSHA512
-	doveadm pw -s SSHA512  -t <HASH>
+check you have the password that matches a given hash
+	doveadm pw -t <HASH>
 
 ### shell in the container
 	docker exec -it dovecot bash
