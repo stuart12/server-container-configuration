@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 w=exim4
-docker build --tag $w .
+docker build --tag $w "$@" . # --no-cache
 docker kill $w || true
 docker rm $w || true
 docker run \

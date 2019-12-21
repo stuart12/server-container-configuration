@@ -1,6 +1,6 @@
 # A docker image for https://www.exim.org/ (exim4)
 
-FROM stuart/debian-sid:2018-05-28
+FROM stuart/debian-sid:latest
 MAINTAINER Stuart Pook
 EXPOSE 25 587
 
