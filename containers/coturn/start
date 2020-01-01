@@ -1,5 +1,14 @@
 #!/bin/sh -ex
-docker kill coturn
+docker build --tag coturn "$@" . # --no-cache
+docker stop coturn
 docker rm coturn
-docker run --restart unless-stopped --detach --publish 3478:3478/udp --publish  3478:3478 --publish 49152-49352/udp --name coturn i-coturn
+docker run \
+	--restart unless-stopped \
+	--detach \
+	--publish 3478:3478/udp \
+	--publish  3478:3478 \
+	--publish 49152-49352/udp \
+	--name coturn \
+	--cap-drop=all \
+	i-coturn
 docker logs --follow coturn
