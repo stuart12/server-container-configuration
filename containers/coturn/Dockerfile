@@ -2,7 +2,7 @@
 # You must change EXTERNAL_IP
 # turnserver.conf just contains static-auth-secret=????
 # the same secret must be in your matrix-synapse configuration
-FROM alpine:edge
+FROM alpine:latest
 LABEL version="1.0"
 MAINTAINER Stuart Pook
 
@@ -12,6 +12,7 @@ ENV EXTERNAL_IP 31.220.4.198
 ENV MIN_PORT 49152
 ENV MAX_PORT 49352
 ENV LISTENING_PORT 3478
+RUN apk update
 RUN apk add --no-cache coturn
 # https://github.com/matrix-org/synapse/blob/master/docs/turn-howto.rst
 ENTRYPOINT exec turnserver -c $CONFIG \
