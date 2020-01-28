@@ -44,3 +44,6 @@ the same secret must be in your matrix-synapse configuration
 ## coturn behind nginx proxy
 
 [no](https://github.com/coturn/coturn/issues/43)
+
+## run shell in container
+	docker exec --interactive --tty coturn /bin/sh

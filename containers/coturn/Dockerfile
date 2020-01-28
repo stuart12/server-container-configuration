@@ -21,14 +21,18 @@ ENTRYPOINT exec turnserver -c $CONFIG \
 	--max-port $MAX_PORT \
 	--listening-port $LISTENING_PORT \
 	--realm turn.pook.it \
+	--total-quota=128 \
 	--verbose \
-	--lt-cred-mech \
 	--use-auth-secret \
 	--no-tcp-relay \
-	--denied-peer-ip=10.0.0.0-10.255.255.255 \
 	--no-cli \
+	--no-stdout-log \
 	--log-file -
 
+# --denied-peer-ip=192.168.0.0-192.168.255.255
+# --denied-peer-ip=172.16.0.0-172.31.255.255
+# --denied-peer-ip=10.0.0.0-10.255.255.255
 EXPOSE $LISTENING_PORT
 EXPOSE $LISTENING_PORT/udp
 EXPOSE $MIN_PORT:$MAX_PORT/udp
+EXPOSE $MIN_PORT:$MAX_PORT

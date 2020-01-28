@@ -8,7 +8,8 @@ docker run \
 	--publish 3478:3478/udp \
 	--publish  3478:3478 \
 	--publish 49152-49352/udp \
+	--publish 49152-49352 \
 	--name coturn \
 	--cap-drop=all \
-	i-coturn
+	coturn
 docker logs --follow coturn
