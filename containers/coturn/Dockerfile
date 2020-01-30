@@ -25,10 +25,13 @@ ENTRYPOINT exec turnserver -c $CONFIG \
 	--verbose \
 	--use-auth-secret \
 	--no-tcp-relay \
+	--no-multicast-peers \
+	--mobility \
 	--no-cli \
 	--no-stdout-log \
 	--log-file=-
 
+	# --no-auth \
 # --denied-peer-ip=192.168.0.0-192.168.255.255
 # --denied-peer-ip=172.16.0.0-172.31.255.255
 # --denied-peer-ip=10.0.0.0-10.255.255.255
