@@ -16,6 +16,7 @@ RUN apk update
 RUN apk add --no-cache coturn
 # https://github.com/matrix-org/synapse/blob/master/docs/turn-howto.rst
 ENTRYPOINT exec turnserver -c $CONFIG \
+	--userdb /tmp/turndb \
 	--external-ip $EXTERNAL_IP \
 	--min-port $MIN_PORT \
 	--max-port $MAX_PORT \
@@ -36,3 +37,4 @@ EXPOSE $LISTENING_PORT
 EXPOSE $LISTENING_PORT/udp
 EXPOSE $MIN_PORT:$MAX_PORT/udp
 EXPOSE $MIN_PORT:$MAX_PORT
+USER turnserver
