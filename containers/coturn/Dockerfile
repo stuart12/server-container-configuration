@@ -14,21 +14,20 @@ ENV MAX_PORT 49352
 ENV LISTENING_PORT 3478
 RUN apk update
 RUN apk add --no-cache coturn
-# https://github.com/matrix-org/synapse/blob/master/docs/turn-howto.rst
 ENTRYPOINT exec turnserver -c $CONFIG \
-	--userdb /tmp/turndb \
-	--external-ip $EXTERNAL_IP \
-	--min-port $MIN_PORT \
-	--max-port $MAX_PORT \
-	--listening-port $LISTENING_PORT \
-	--realm turn.pook.it \
+	--userdb=/tmp/turndb \
+	--external-ip=$EXTERNAL_IP \
+	--min-port=$MIN_PORT \
+	--max-port=$MAX_PORT \
+	--listening-port=$LISTENING_PORT \
+	--realm=turn.pook.it \
 	--total-quota=128 \
 	--verbose \
 	--use-auth-secret \
 	--no-tcp-relay \
 	--no-cli \
 	--no-stdout-log \
-	--log-file -
+	--log-file=-
 
 # --denied-peer-ip=192.168.0.0-192.168.255.255
 # --denied-peer-ip=172.16.0.0-172.31.255.255
