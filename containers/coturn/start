@@ -1,14 +1,23 @@
 #!/bin/sh -ex
-docker build --tag coturn "$@" . # --no-cache
-docker stop coturn
-docker rm coturn
+stun_port=3478
+relay_min=49152
+relay_max=49352
+public_ip=$(ip route get 1.2.3.4 | awk '{print $7;exit}')
+docker build \
+	--build-arg stun_port=$stun_port \
+	--build-arg relay_min=$relay_min \
+	--build-arg relay_max=$relay_max \
+	--build-arg public_ip=$public_ip \
+	--tag coturn "$@" . # --no-cache
+docker stop coturn || true
+docker rm coturn || true
 docker run \
 	--restart unless-stopped \
 	--detach \
-	--publish 3478:3478/udp \
-	--publish  3478:3478 \
-	--publish 49152-49352/udp \
-	--publish 49152-49352 \
+	--publish $stun_port:$stun_port/udp \
+	--publish $stun_port:$stun_port \
+	--publish $relay_min-$relay_max:$relay_min-$relay_max/udp \
+	--publish $relay_min-$relay_max:$relay_min-$relay_max \
 	--name coturn \
 	--cap-drop=all \
 	coturn

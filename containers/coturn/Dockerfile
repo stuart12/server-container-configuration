@@ -2,34 +2,41 @@
 # You must change EXTERNAL_IP
 # turnserver.conf just contains static-auth-secret=????
 # the same secret must be in your matrix-synapse configuration
+# https://github.com/matrix-org/synapse/blob/master/docs/turn-howto.md
 FROM alpine:latest
-LABEL version="1.0"
-MAINTAINER Stuart Pook
-
-ENV CONFIG /etc/coturn.conf
-ADD turnserver.conf $CONFIG
-ENV EXTERNAL_IP 31.220.4.198
-ENV MIN_PORT 49152
-ENV MAX_PORT 49352
-ENV LISTENING_PORT 3478
 RUN apk update
 RUN apk add --no-cache coturn
+MAINTAINER Stuart Pook
+
+ARG relay_min
+ARG relay_max
+ARG stun_port
+ARG public_ip
+
+ENV CONFIG /etc/coturn.conf
+COPY turnserver.conf $CONFIG
+RUN chmod 644 $CONFIG
+ENV EXTERNAL_IP=$public_ip
+ENV MIN_PORT $relay_min
+ENV MAX_PORT $relay_max
+ENV LISTENING_PORT=$stun_port
+# https://github.com/coturn/coturn/blob/master/examples/etc/turnserver.conf
 ENTRYPOINT exec turnserver -c $CONFIG \
+	--pidfile=/tmp/pidfile \
 	--userdb=/tmp/turndb \
 	--external-ip=$EXTERNAL_IP \
 	--min-port=$MIN_PORT \
 	--max-port=$MAX_PORT \
 	--listening-port=$LISTENING_PORT \
 	--realm=turn.pook.it \
+	--user-quota=12 \
 	--total-quota=128 \
 	--verbose \
 	--use-auth-secret \
 	--no-tcp-relay \
 	--no-multicast-peers \
-	--mobility \
 	--no-cli \
-	--no-stdout-log \
-	--log-file=-
+	--log-file=stdout
 
 	# --no-auth \
 # --denied-peer-ip=192.168.0.0-192.168.255.255
@@ -40,3 +47,4 @@ EXPOSE $LISTENING_PORT/udp
 EXPOSE $MIN_PORT:$MAX_PORT/udp
 EXPOSE $MIN_PORT:$MAX_PORT
 USER turnserver
+LABEL version="1.2"
