@@ -27,6 +27,8 @@ https://pook.it/.well-known/matrix/server which must contain
 	docker exec --interactive --tty matrix-synapse register_new_matrix_user -c /etc/matrix-synapse/conf.d/registration.yaml -u <person> -p <password> http://localhost:8008
 
 ## get matrix-synapse version
+	docker exec --interactive --tty matrix-synapse dpkg --list matrix-synapse
+or
     docker run -it --rm --volume matrix-media:/mnt --network proxy stuart/debian-sid:latest bash -i
     apt update && apt install -y curl && curl -I http://matrix-synapse:8008/_matrix/client/r0/login
 
