@@ -2,8 +2,9 @@
 # https://github.com/matrix-org/synapse/issues/2438
 
 uploads_path: /var/lib/matrix-synapse/uploads
-turn_user_lifetime: 15m
+turn_user_lifetime: 1d
 turn_allow_guest: False
+suppress_key_server_warning: True
 
 ## Server ##
 
