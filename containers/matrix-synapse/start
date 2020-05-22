@@ -3,10 +3,11 @@ cd $(dirname "$0")
 w=matrix-synapse
 docker build "$@" --tag matrix-synapse . # --no-cache
 docker stop matrix-synapse || true
-docker rm matrix-synapse
+docker rm matrix-synapse || true
+restart="--restart unless-stopped"
 docker run \
 	--cap-drop=all \
-	--restart unless-stopped \
+	$restart \
 	--name matrix-synapse \
 	--detach \
 	--network postgresql \
