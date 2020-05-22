@@ -1,0 +1,13 @@
+#!/bin/sh
+# https://www.postgresql.org/docs/current/app-postgres.html
+set -xe
+db=${1?}/$version
+initdir=$db/main # this does not agree with the documentation
+
+bin=/usr/lib/postgresql/$version/bin
+
+if [ -z "$(ls -A $initdir)" ];
+then
+	$bin/initdb -E UTF8 -D $initdir
+fi
+exec $bin/postgres -D $db -c config_file=/etc/postgresql/$version/main/postgresql.conf

@@ -1,14 +1,15 @@
 #!/bin/sh -ex
 w=postgresql
-docker build --tag $w .
-docker kill $w || true
-docker rm $w || true
+docker build --tag postgresql .
+docker stop postgresql || true
+docker rm postgresql || true
 docker run \
 	--init \
 	--detach \
-	--name $w \
-	--mount source=postgresql-db,destination=/var/lib/postgresql \
+	--name postgresql \
+	--mount source=postgresql12-db,destination=/var/lib/postgresql \
 	--restart unless-stopped \
-	--network $w \
-       	$w
-docker logs --follow $w
+	--network postgresql \
+	--cap-drop=all \
+	postgresql
+docker logs --follow postgresql

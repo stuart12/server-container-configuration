@@ -1,14 +1,17 @@
 # A dockerfile for postgresql
 
 # https://docs.docker.com/engine/examples/postgresql_service
-FROM stuart/debian-sid:2018.03.31
+FROM stuart/debian-sid:latest
 LABEL maintainer "Stuart Pook"
 EXPOSE 5432
-ARG version=10
 
 RUN apt-get update -q
 RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y --no-install-recommends
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends postgresql-10
+ARG USER=postgres
+ARG version=12
+ENV version $version
+RUN adduser --disabled-password --disabled-login --no-create-home --uid 1023 --gecos PostgreSQL $USER
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends postgresql-$version
 RUN apt-get --purge -q -y --allow-remove-essential remove \
 	bash \
 	e2fsprogs \
@@ -19,15 +22,15 @@ RUN apt-get --purge -q -y --allow-remove-essential remove \
 RUN apt-get autoremove
 RUN apt-get clean
 
-RUN echo host all all 0.0.0.0/0 md5 >> /etc/postgresql/10/main/pg_hba.conf
-RUN echo "listen_addresses='*'" >> /etc/postgresql/10/main/postgresql.conf
+COPY script /script
+
+RUN echo host all all 0.0.0.0/0 md5 >> /etc/postgresql/$version/main/pg_hba.conf
+RUN echo "listen_addresses='*'" >> /etc/postgresql/$version/main/postgresql.conf
 VOLUME ["/var/lib/postgresql"]
 
-USER postgres
+USER $USER
 
-RUN mkdir -m 755 /var/run/postgresql/10-main.pg_stat_tmp
+ENTRYPOINT ["/bin/sh"]
+CMD ["/script", "/var/lib/postgresql"]
 
-ENTRYPOINT ["/usr/lib/postgresql/10/bin/postgres"]
-CMD ["-D", "/var/lib/postgresql/10/main", "-c", "config_file=/etc/postgresql/10/main/postgresql.conf"]
-
-LABEL version "1.1"
+LABEL version "1.2"

@@ -1,4 +1,7 @@
 # Hints
+## create volume for database
+	docker volume create postgresql12-db
+	docker run -it --rm --mount source=postgresql12-db,destination=/mnt stuart/debian-sid:latest sh -ce 'mkdir -pm 700 /mnt/12/main && chown 1023 /mnt/12/main'
 ## build the image
 	docker build --tag postgresql .
 ## run the image
