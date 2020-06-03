@@ -4,7 +4,8 @@
 w=nextcloud
 docker stop $w || true
 docker rm $w || true
-version=15 # only increase versions one at a time
+version=18 # only increase versions one at a time
+# may need to remove cap-drop=all when upgrading
 docker pull $w:$version
 docker run \
 	--detach \
