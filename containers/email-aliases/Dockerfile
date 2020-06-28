@@ -1,6 +1,6 @@
 # docker image to add aliases to exim
 
-FROM stuart/debian-sid:2018-05-28
+FROM stuart/debian-sid:latest
 MAINTAINER Stuart Pook
 ENV DEBIAN_FRONTEND=noninteractive
 
