@@ -1,6 +1,6 @@
 # dovecot: A docker image for https://www.dovecot.org/
 
-FROM stuart/debian-sid:2018-05-28
+FROM stuart/debian-sid:latest
 LABEL maintainer "Stuart Pook"
 
 ENV DEBIAN_FRONTEND noninteractive
