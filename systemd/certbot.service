@@ -3,4 +3,16 @@ Description=Renew Let's Encrypt Certificates
 [Service]
 EnvironmentFile=/etc/stuart/systemd/certbot.env
 Type=oneshot
-ExecStart=/bin/sh -xc '/usr/bin/docker run --rm --volume letsencrypt-etc:/etc/letsencrypt --volume letsencrypt-run:/run/letsencrypt deliverous/certbot renew --webroot --webroot-path=/run/letsencrypt --email $EMAIL --no-eff-email --post-hook "echo DONE4" | tee /dev/stdout | grep --with-filename --label Found ^DONE4 && /usr/bin/docker kill -s HUP proxy; exit 0'
+ExecStart=/usr/bin/docker run --rm --volume letsencrypt-etc:/etc/letsencrypt --volume letsencrypt-run:/run/letsencrypt certbot/certbot \
+	renew \
+	--webroot \
+	--webroot-path=/run/letsencrypt \
+	--email=$EMAIL \
+	--no-eff-email
+# exim reads the certicate file at every connection so is always up to date. Nginx needs a SIGHUP to reread the certificate file.
+# So if the their certificates have different dates nginx must be signaled to reread the certificates.
+ExecStart=/bin/bash -xc '\
+	diff \
+		<(echo | openssl s_client -servername smtp3.pook.it -connect smtp3.pook.it:submission -starttls smtp 2> /dev/null | openssl x509 -noout -dates) \
+		<(echo | openssl s_client -servername hh.pook.it -connect hh.pook.it:https 2> /dev/null | openssl x509 -noout -dates) \
+	|| /usr/bin/docker kill -s HUP proxy'
