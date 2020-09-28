@@ -2,7 +2,7 @@
 # Secure, End-to-End encrypted and journalized personal information synchronization.
 
 # use any Debian sid image
-FROM stuart/debian-sid:2018-05-28
+FROM stuart/debian-sid:latest
 LABEL maintainer "Stuart Pook"
 
 RUN set -x && \
@@ -63,7 +63,7 @@ ARG DB_DIR=/db
 RUN set -x && \
 	adduser --system --group --uid 900 $USER && \
 	cd $PROGRAM_DIR && \
-	sed -i -e '/^\[allowed_hosts\]/aallowed_host1 = etesync.pook.it' -e "/^name = /s@=.*@= $DB_DIR/etesync.sqlite3@" etesync-server.ini && \
+	sed -e '/^allowed_host1 /s/=.*/ = etesync.pook.it/' -e "/^name = db/s@=.*@= $DB_DIR/etesync.sqlite3@" etesync-server.ini.example > etesync-server.ini && \
 	dd bs=40 count=1 if=/dev/urandom status=none | sha1sum | cut -f1 -d ' ' > secret.txt && \
 	chown $USER secret.txt && \
 	: Set secret.txt not readable so etesync will create a new secret each time it is run && \
@@ -81,4 +81,4 @@ ENTRYPOINT [ "/bin/sh" ]
 WORKDIR $PROGRAM_DIR
 CMD [ "-xc", "/usr/bin/python3 manage.py migrate && exec /usr/bin/python3 manage.py runserver 0.0.0.0:$LISTEN_PORT" ]
 
-LABEL version "1.1"
+LABEL version "1.2"
