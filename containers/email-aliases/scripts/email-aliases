@@ -32,9 +32,12 @@ def read_alias(aliases):
     with open(aliases) as f:
         for l in f:
             parts = l.split(':')
-            if len(parts) != 2:
+            if len(parts) == 2:
+                r[parts[0].strip()] = parts[1].strip()
+            elif len(parts) == 4 and len(parts[1].strip()) == 0 and len(parts[2].strip()) != 0:
+                r[parts[0].strip()] = ':' + parts[2].strip() + ':'
+            else:
                 error("bad alias line:", l.strip())
-            r[parts[0].strip()] = parts[1].strip()
     return r
 
 def dump(aliases, domain):
