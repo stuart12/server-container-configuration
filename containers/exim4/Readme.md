@@ -14,10 +14,10 @@
 	openssl s_client -connect exim4:587 -starttls smtp
 
 ### check aliases file
-	docker run --volume exim4:/exim --rm -it stuart/debian-sid:2018.03.31 bash
+	docker run --volume exim4:/exim --rm -it stuart/debian-sid:latest bash
 
 ### run shell in the networl
-	docker run --network proxy  --rm -it  stuart/debian-sid:2018.03.31 bash
+	docker run --network proxy  --rm -it  stuart/debian-sid:latest bash
 
 ## GPG Keys
 export a [public key](http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/) for each user than you want to encrypt incoming messages for
