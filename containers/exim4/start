@@ -1,20 +1,19 @@
 #!/bin/sh -ex
-w=exim4
-docker build --tag $w "$@" . # --no-cache
-docker kill $w || true
-docker rm $w || true
+docker build --tag exim4 "$@" . # --no-cache
+docker stop exim4w || true
+docker rm exim4 || true
 docker run \
 	--init \
 	--restart unless-stopped \
 	--publish 25:25 \
 	--publish 587:587 \
 	--detach \
-	--name $w \
+	--name exim4 \
 	--volume email:/mail \
 	--volume exim4:/etc/exim-volume:ro \
 	--volume exim4-dkim:/etc/exim-dkim:ro \
 	--volume dovecot-sockets:/var/dovecot-sockets:ro \
 	--volume letsencrypt-etc:/etc/letsencrypt:ro \
 	--volume exim4-spool:/var/spool/exim4 \
-       	$w
-docker logs --follow $w
+	exim4
+docker logs --follow exim4
