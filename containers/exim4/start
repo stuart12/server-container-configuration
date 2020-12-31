@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 docker build --tag exim4 "$@" . # --no-cache
-docker stop exim4w || true
+docker stop exim4 || true
 docker rm exim4 || true
 docker run \
 	--init \
