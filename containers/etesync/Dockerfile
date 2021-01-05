@@ -1,5 +1,6 @@
 # EteSync: https://www.etesync.com/
 # Secure, End-to-End encrypted and journalized personal information synchronization.
+# A Dockerfile for etebase-v2
 
 # use any Debian sid image
 FROM stuart/debian-sid:latest
@@ -100,6 +101,6 @@ EXPOSE $LISTEN_PORT
 USER $USER
 ENTRYPOINT [ "/bin/sh" ]
 WORKDIR $PROGRAM_DIR
-CMD [ "-xc", "/usr/bin/python3 manage.py migrate && exec /usr/bin/python3 manage.py runserver 0.0.0.0:$LISTEN_PORT" ]
+CMD [ "-xc", "/usr/bin/python3 manage.py migrate && exec uvicorn etebase_server.asgi:application --host 0.0.0.0 --port $LISTEN_PORT" ]
 
 LABEL version "2.0"

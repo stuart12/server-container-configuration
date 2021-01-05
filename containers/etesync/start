@@ -1,15 +1,15 @@
 #!/bin/sh -xe
-docker build --tag etesync-v2 "$@" . # --no-cache
-docker stop etesync-v2 || true
-docker rm etesync-v2 || true
+docker build --tag etesync "$@" . # --no-cache
+docker stop etesync || true
+docker rm etesync || true
 docker volume inspect etesync-v2-db > /dev/null 2>&1 || docker volume create etesync-v2-db
 docker run --init \
 	--detach \
 	--network proxy \
-	--name etesync-v2 \
+	--name etesync \
 	--cap-drop=all \
 	--mount type=volume,source=etesync-v2-db,destination=/db \
 	--restart unless-stopped \
-	etesync-v2 # -xc 'sleep 23d'
-docker logs --follow etesync-v2
+	etesync
+docker logs --follow etesync
 exit 0
