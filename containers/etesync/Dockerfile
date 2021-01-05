@@ -32,10 +32,27 @@ RUN set -x && \
 		xxd \
 		&& \
 	apt-get upgrade --no-install-recommends -q -y && \
+	true
+RUN set -x && \
 	apt-get install -q -y --no-install-recommends \
 		git-core \
+		python3-asgiref \
+		python3-cffi \
+		python3-h11 \
+		python3-click \
+		python3-dotenv \
+		python3-httptools \
+		python3-nacl \
 		python3-pip \
+		python3-pycparser \
 		python3-setuptools \
+		python3-six \
+		python3-typing-extensions \
+		python3-uvloop \
+		python3-watchgod \
+		python3-websockets \
+		python3-wheel \
+		python3-yaml \
 		&& \
 	apt-get clean && \
 	apt-get auto-remove -y && \
@@ -52,18 +69,22 @@ ARG PROGRAM_DIR=/etesync
 
 RUN set -x && \
 	umask 22 && \
-	git clone https://github.com/etesync/server-skeleton.git $PROGRAM_DIR && \
-	pip3 install wheel && \
+	git clone https://github.com/etesync/server.git $PROGRAM_DIR && \
 	pip3 install -r $PROGRAM_DIR/requirements.txt && \
 	true
+
+RUN apt-get purge -y -q git-core && apt-get auto-remove -y -q
 
 ARG USER=etesync
 ARG DB_DIR=/db
 
+ARG CONFIG=etebase-server.ini
+
 RUN set -x && \
 	adduser --system --group --uid 900 $USER && \
 	cd $PROGRAM_DIR && \
-	sed -e '/^allowed_host1 /s/=.*/ = etesync.pook.it/' -e "/^name = db/s@=.*@= $DB_DIR/etesync.sqlite3@" etesync-server.ini.example > etesync-server.ini && \
+	sed -e '/^allowed_host1 /s/=.*/ = etesync.pook.it/' -e "/^name = db/s@=.*@= $DB_DIR/etesync.sqlite3@" $CONFIG.example > $CONFIG && \
+	diff $CONFIG.example $CONFIG | grep . && \
 	dd bs=40 count=1 if=/dev/urandom status=none | sha1sum | cut -f1 -d ' ' > secret.txt && \
 	chown $USER secret.txt && \
 	: Set secret.txt not readable so etesync will create a new secret each time it is run && \
@@ -81,4 +102,4 @@ ENTRYPOINT [ "/bin/sh" ]
 WORKDIR $PROGRAM_DIR
 CMD [ "-xc", "/usr/bin/python3 manage.py migrate && exec /usr/bin/python3 manage.py runserver 0.0.0.0:$LISTEN_PORT" ]
 
-LABEL version "1.2"
+LABEL version "2.0"
