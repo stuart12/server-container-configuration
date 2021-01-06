@@ -84,7 +84,11 @@ ARG CONFIG=etebase-server.ini
 RUN set -x && \
 	adduser --system --group --uid 900 $USER && \
 	cd $PROGRAM_DIR && \
-	sed -e '/^allowed_host1 /s/=.*/ = etesync.pook.it/' -e "/^name = db/s@=.*@= $DB_DIR/etesync.sqlite3@" $CONFIG.example > $CONFIG && \
+	sed \
+		-e "/^;*media_root *=.*/s@@media_root = $DB_DIR/media@" \
+		-e '/^allowed_host1 /s/=.*/= etesync.pook.it/' \
+		-e "/^name = db/s@=.*@= $DB_DIR/etesync.sqlite3@" \
+		$CONFIG.example > $CONFIG && \
 	diff $CONFIG.example $CONFIG | grep . && \
 	dd bs=40 count=1 if=/dev/urandom status=none | sha1sum | cut -f1 -d ' ' > secret.txt && \
 	chown $USER secret.txt && \
