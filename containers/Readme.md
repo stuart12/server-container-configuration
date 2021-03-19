@@ -11,6 +11,8 @@
 ### dangling volumes
 ## show dangling volumes
 	docker volume ls --filter dangling=true
+## check when volume last mounted
+	docker volume inspect xxxxx
 ## clean up docker disk usage
 make sure all containers are running before running this command
 
