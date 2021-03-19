@@ -9,6 +9,11 @@ ARG TURN_SECRET
 
 RUN apt-get update -q
 RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -q -y
+RUN cat /etc/apt/sources.list
+RUN sed -e 's/sid/stable/' /etc/apt/sources.list > /etc/apt/sources.list.d/stable.list
+RUN sed -e 's/sid/testing/' /etc/apt/sources.list > /etc/apt/sources.list.d/testing.list
+RUN apt-get update -q
+RUN DEBIAN_FRONTEND=noninteractive apt-get -yq -t stable install python3-chardet/stable
 RUN adduser --system --home /var/lib/matrix-synapse --uid 800 --group matrix-synapse
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y matrix-synapse
 RUN DEBIAN_FRONTEND=noninteractive apt-get --purge -q -y --allow-remove-essential remove \
