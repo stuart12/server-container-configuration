@@ -2,7 +2,7 @@
 cd $(dirname $0)
 w=dovecot
 docker build --tag $w . "$@"
-docker kill $w || true
+docker stop $w || true
 docker rm $w
 docker run --init \
 	--restart unless-stopped \
