@@ -1,9 +1,9 @@
 #!/bin/sh -xe
 cd $(dirname "$0")
 n=proxy
-docker build --tag myproxy .
-docker stop $n
-docker rm proxy
+docker build "$@" --tag myproxy .
+docker stop proxy || true
+docker rm proxy || true
 docker run --detach \
 	--cap-drop=all \
 	--cap-add chown \
@@ -18,8 +18,7 @@ docker run --detach \
 	--publish 143:143 \
 	--volume letsencrypt-etc:/etc/letsencrypt:ro \
 	--volume letsencrypt-run:/run/letsencrypt:ro \
-	--name $n \
+	--name proxy \
 	--restart unless-stopped \
-	myproxy \
-	"$@"
+	myproxy
 docker logs --follow proxy
