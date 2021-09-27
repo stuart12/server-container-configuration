@@ -4,12 +4,13 @@
 w=nextcloud
 docker stop $w || true
 docker rm $w || true
-version=18 # only increase versions one at a time
+version=19 # only increase versions one at a time
 # may need to remove cap-drop=all when upgrading
+drop=--cap-drop=all
 docker pull $w:$version
 docker run \
 	--detach \
-	--cap-drop=all \
+	$drop \
 	--cap-add net_bind_service \
 	--cap-add setgid \
 	--cap-add setuid \
