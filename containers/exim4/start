@@ -16,4 +16,5 @@ docker run \
 	--volume letsencrypt-etc:/etc/letsencrypt:ro \
 	--volume exim4-spool:/var/spool/exim4 \
 	exim4
-docker logs --follow exim4
+exec \
+docker logs --timestamps --follow exim4
