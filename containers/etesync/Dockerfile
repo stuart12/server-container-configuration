@@ -34,12 +34,12 @@ RUN set -x && \
 		&& \
 	apt-get upgrade --no-install-recommends -q -y && \
 	true
+RUN apt-get install -q -y --no-install-recommends git-core
+ENV DEBIAN_FRONTEND=noninteractive
 RUN set -x && \
 	apt-get install -q -y --no-install-recommends \
-		git-core \
 		python3-asgiref \
 		python3-cffi \
-		python3-h11 \
 		python3-click \
 		python3-dotenv \
 		python3-httptools \
@@ -68,13 +68,17 @@ RUN set -x && \
 
 ARG PROGRAM_DIR=/etesync
 
+RUN apt-get install -q -y --no-install-recommends gcc
+RUN apt-get install -q -y --no-install-recommends libpython3.9-dev
 RUN set -x && \
 	umask 22 && \
 	git clone https://github.com/etesync/server.git $PROGRAM_DIR && \
-	pip3 install -r $PROGRAM_DIR/requirements.txt && \
+	cd $PROGRAM_DIR && \
+	git rev-parse HEAD > git-HEAD.txt && \
+	pip3 install --requirement requirements.txt && \
 	true
 
-RUN apt-get purge -y -q git-core && apt-get auto-remove -y -q
+RUN apt-get purge -y -q git-core gcc && apt-get auto-remove -y -q
 
 ARG USER=etesync
 ARG DB_DIR=/db
