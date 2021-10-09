@@ -11,3 +11,5 @@
 # bookmarks
 [etesync/server-skeleton](https://github.com/etesync/server-skeleton)
 [ETESync Docker Images](https://github.com/victor-rds/docker-etesync)
+## git server code SHA1 hash
+	docker exec etesync cat /etesync/git-HEAD.txt
