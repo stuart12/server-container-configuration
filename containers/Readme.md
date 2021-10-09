@@ -33,3 +33,5 @@ make sure all containers are running before running this command
 	docker ps -a -f status=exited
 ### remove
 	docker rm $(docker ps -a -f status=exited -q)
+## Check space
+	docker system df -v && docker system df
