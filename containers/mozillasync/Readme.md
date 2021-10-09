@@ -1,4 +1,13 @@
 # Syncserver
+## building the image
+builing the image requires stopping all containers else the compile is killed by a lack of memory
+## error logs in Firefox
+about:sync-log
+## database upgrade
+[sqlite](https://github.com/mozilla-services/syncserver/pull/193#commitcomment-36884169)
+[PostgreSQL](https://adol.pw/2020/04/12/fixing-firefox-sync-server/)
+	ALTER TABLE users ADD keys_changed_at BIGINT;
+	ALTER TABLE users ADD node VARCHAR(255);
 ## server
 [Mozila Syncserver](https://github.com/mozilla-services/syncserver)
 ## Apache2
